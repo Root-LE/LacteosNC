@@ -7,12 +7,8 @@ Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
 
 ## Fase 2 — Publicar el sitio (en curso)
 
-- [ ] **Fer:** delegar `lacteosnc.com.ar` en nic.ar a `brynne.ns.cloudflare.com` y `kanye.ns.cloudflare.com` (opción "Delegar", no "Transferir"; borrar otros servidores).
-- [ ] **Fer:** dar permiso a la app de Claude en GitHub sobre el repositorio `Root-LE/LacteosNC` (Settings → Applications → Claude → Configure → Repository access).
-- [ ] **Claude:** subir el sitio al repositorio.
-- [ ] **Claude + Fer:** crear el proyecto en Cloudflare Pages conectado al repositorio (Fer autoriza la app de Cloudflare en GitHub).
-- [ ] **Claude:** cuando Cloudflare marque el dominio como activo, conectar `lacteosnc.com.ar` y `www.lacteosnc.com.ar` al proyecto de Pages.
-- [ ] **Claude:** verificar que el sitio abra con candado (HTTPS) en ambas direcciones.
+- [ ] **Claude:** cuando Cloudflare marque `lacteosnc.com.ar` como **Active** (esperando la propagación de la delegación de nic.ar, hecha el 05/11/2026), conectar `lacteosnc.com.ar` y `www.lacteosnc.com.ar` en Pages → lacteosnc → Custom domains.
+- [ ] **Claude:** verificar que el sitio abra con candado (HTTPS) en ambas direcciones y que `www` redirija a la principal.
 
 ## Fase 3 — Base de datos en Supabase (proyecto LacteosNC)
 

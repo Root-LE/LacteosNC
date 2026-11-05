@@ -97,13 +97,21 @@ Cada plan nuevo se agrega al final con la misma estructura.
 
 ---
 
-## Plan 6 — Fase 2: dominio en Cloudflare (parcial)
+## Plan 6 — Fase 2: publicación en GitHub y Cloudflare Pages
 
-**Fecha:** 05/11/2026 · **Estado:** en curso (ver `PENDIENTES.md`)
+**Fecha:** 05/11/2026 · **Estado:** casi completo (falta conectar el dominio, ver `PENDIENTES.md`)
 
 **Pasos hechos:**
-1. Desde el Chrome del usuario se agregó `lacteosnc.com.ar` a Cloudflare con el plan Free.
+1. Desde el Chrome del usuario se agregó `lacteosnc.com.ar` a Cloudflare con el plan Free. No había registros DNS previos.
 2. Cloudflare asignó los servidores `brynne.ns.cloudflare.com` y `kanye.ns.cloudflare.com`.
-3. No había registros DNS previos (dominio nuevo); se crean al conectar el dominio con Pages.
+3. El usuario delegó el dominio en nic.ar a esos dos servidores (estado: "delegado: SI").
+4. Se instaló la app **Claude** de GitHub en la cuenta Root-LE, con acceso **solo** al repositorio `LacteosNC`.
+5. Se subió el sitio al repositorio, rama `main` (50 archivos). Se agregó `.gitignore` y se excluyó la imagen sin uso `logo-nc-leche.png`.
+6. Se instaló la app **Cloudflare Workers and Pages** de GitHub, también con acceso **solo** a `LacteosNC`.
+7. Se creó el proyecto de Pages **lacteosnc**: rama de producción `main`, framework "None", sin comando de compilación, carpeta de salida `/`.
+8. Primera publicación correcta en **https://lacteosnc.pages.dev**.
+9. Se pidió a Cloudflare revisar los servidores de nombres; queda esperando la propagación.
 
-**Pasos que faltan:** delegación en nic.ar, permiso de GitHub, subir el código, crear el proyecto de Pages y conectar el dominio.
+**Cómo se publica de ahora en más:** cada cambio que se sube a la rama `main` del repositorio se publica solo en Cloudflare Pages en uno o dos minutos.
+
+**Pasos que faltan:** conectar `lacteosnc.com.ar` y `www.lacteosnc.com.ar` cuando el dominio quede activo.
