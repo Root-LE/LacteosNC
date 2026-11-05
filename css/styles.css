@@ -343,6 +343,10 @@ p { margin: 0 0 1em; }
 .nov__img img { width: 100%; aspect-ratio: 2 / 2.75; object-fit: cover; object-position: center 40%; transition: transform .5s; }
 .nov--principal .nov__img img { aspect-ratio: 2 / 2.6; }
 .nov__img:hover img { transform: scale(1.03); }
+.nov__img--video { cursor: default; background: #000; aspect-ratio: 9 / 12; }
+.nov--principal .nov__img--video { aspect-ratio: 2 / 2.6; }
+.nov__img--yt, .nov--principal .nov__img--yt { aspect-ratio: 16 / 9; }
+.nov__img--video iframe, .nov__img--video video { display: block; width: 100%; height: 100%; border: 0; object-fit: cover; }
 .nov__img:focus-visible { outline: 3px solid var(--blanco); outline-offset: 4px; }
 .nov__cuerpo { padding-top: 1.1rem; }
 .nov__cuerpo .etiqueta { background: var(--rojo); }

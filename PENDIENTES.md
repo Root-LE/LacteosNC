@@ -10,14 +10,11 @@ Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
 - [ ] **Claude:** cuando Cloudflare marque `lacteosnc.com.ar` como **Active** (esperando la propagación de la delegación de nic.ar, hecha el 05/11/2026), conectar `lacteosnc.com.ar` y `www.lacteosnc.com.ar` en Pages → lacteosnc → Custom domains.
 - [ ] **Claude:** verificar que el sitio abra con candado (HTTPS) en ambas direcciones y que `www` redirija a la principal.
 
-## Fase 3 — Base de datos en Supabase (proyecto LacteosNC)
+## Fase 3 — Pendientes que quedaron de la base de datos
 
-- [ ] Tablas: perfiles de usuario (rol, lista de precio, CUIT, estado de la cuenta), productos (código, nombre, tipo, descripción, datos, foto, "nuevo", visible, orden), listas de precio y precios por producto, novedades (texto, foto, video), pedidos y renglones de pedido, mensajes de contacto.
-- [ ] Roles: **visitante** (sin sesión), **cliente**, **empleado**, **administrador**.
-- [ ] Reglas de seguridad (RLS) para que cada rol vea y modifique solo lo suyo.
-- [ ] Carpetas de archivos (Storage): fotos de productos y novedades, videos cortos.
-- [ ] Cargar los 11 productos y las 3 novedades actuales.
-- [ ] La página pública lee productos y novedades desde la base.
+- [ ] **Fer:** pasar los **códigos reales** de los 11 productos (hoy tienen códigos provisorios NC-001 a NC-011).
+- [ ] **Fer:** pasar los **precios** de cada producto para cada lista (Lista 1 precio sur, Lista 2 precio CABA, Lista 3 precio cliente), o cargarlos desde el panel cuando esté listo.
+- [ ] **Fer + Claude:** crear el primer usuario **administrador** (pasos en `supabase/README.md`).
 
 ## Fase 4 — Panel de administración (`/admin`)
 

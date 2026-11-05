@@ -115,3 +115,30 @@ Cada plan nuevo se agrega al final con la misma estructura.
 **Cómo se publica de ahora en más:** cada cambio que se sube a la rama `main` del repositorio se publica solo en Cloudflare Pages en uno o dos minutos.
 
 **Pasos que faltan:** conectar `lacteosnc.com.ar` y `www.lacteosnc.com.ar` cuando el dominio quede activo.
+
+---
+
+## Plan 7 — Fase 3: base de datos en Supabase
+
+**Fecha:** 05/11/2026 · **Estado:** hecho
+
+**Objetivo:** tener usuarios, roles, productos, listas de precio, novedades y pedidos en una base PostgreSQL, y que el sitio público lea productos y novedades desde ahí.
+
+**Pasos:**
+1. Se revisó el proyecto **LacteosNC** de Supabase: estaba vacío.
+2. **Migración 01 — estructura:** 9 tablas (`listas_precio`, `perfiles`, `categorias`, `productos`, `precios`, `novedades`, `pedidos`, `pedido_items`, `mensajes_contacto`), tipos para rol, estado de cuenta, estado de pedido y tipo de medio, controles de datos (CUIT de 11 dígitos, usuario de 3 a 30 caracteres, cantidades positivas) y fechas de actualización automáticas. Los pedidos se numeran desde **1001**.
+3. **Migración 02 — seguridad:** reglas por rol (RLS) en todas las tablas; funciones auxiliares en un esquema privado; alta automática del perfil cuando alguien se registra (toma nombre, apellido, CUIT y aceptación de términos); al verificar el mail pasa a *pendiente de activación*; funciones `crear_pedido`, `detalle_pedido`, `abrir_pedido`, `marcar_retirado` y `activar_cuenta`.
+4. **Migración 03 — archivos:** carpetas `productos` (imágenes) y `novedades` (imágenes y videos), máximo 5 MB, solo el administrador sube.
+5. **Migración 04 — datos iniciales:** Lista 1 (precio sur), Lista 2 (precio CABA), Lista 3 (precio cliente); 4 categorías; los 11 productos del sitio con códigos provisorios NC-001 a NC-011; las 3 novedades.
+6. **Pruebas de permisos** con usuarios de prueba (se deshicieron al terminar):
+   - visitante: ve 11 productos y 3 novedades, 0 precios, no puede pedir;
+   - cliente 1: ve solo los 11 precios de su lista, crea el pedido con total correcto, no puede editar productos, hacerse administrador, insertar pedidos directo ni abrirlos;
+   - cliente 2: no ve pedidos ajenos y ve solo los precios de su lista;
+   - cuenta pendiente: no ve precios ni puede pedir;
+   - empleado: ve todos los pedidos, al abrir pasa a *armando*, luego a *retirado*; no puede editar productos ni activar cuentas;
+   - administrador: activa cuentas y edita productos.
+7. Asesor de seguridad de Supabase: solo avisa que los usuarios con sesión pueden llamar a las 5 funciones de pedidos y cuentas, que es lo buscado (cada una controla permisos adentro).
+8. **Sitio público:** `js/config.js` con la URL y la clave pública; `js/main.js` carga categorías, productos y novedades desde la base; si la base no responde usa la lista de respaldo. Novedades admite foto, enlace de YouTube (16:9) o video propio. Todo el texto que viene de la base se escapa antes de mostrarse.
+9. Versión de CSS y JS subida a `?v=4`.
+
+**Archivos:** `supabase/migrations/*.sql`, `supabase/README.md`, `js/config.js`, `js/main.js`, `css/styles.css`, `index.html`, `404.html`.

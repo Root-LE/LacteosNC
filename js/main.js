@@ -3,7 +3,9 @@
    Para agregar o editar un producto, modificá la lista PRODUCTOS.
    ===================================================================== */
 
-const PRODUCTOS = [
+/* Lista de respaldo: se usa si la base de datos no responde.
+   Los datos reales se cargan desde Supabase (ver cargarDesdeBase). */
+let PRODUCTOS = [
   {
     id: "reggianito", nombre: "Reggianito", familia: "duros", familiaTxt: "Queso duro",
     foco: "40% 70%",
@@ -101,27 +103,121 @@ document.addEventListener("DOMContentLoaded", () => {
   }, { rootMargin: "-45% 0px -50% 0px" });
   document.querySelectorAll("main section[id]").forEach(s => obs.observe(s));
 
+  /* ---------- Utilidades ---------- */
+  const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const urlSegura = u => (typeof u === "string" && /^(https:\/\/|\/(?!\/)|img\/)/.test(u)) ? u : "";
+  const fotoChica  = p => urlSegura(p.imgSm) || `img/productos/${p.id}-sm.jpg`;
+  const fotoGrande = p => urlSegura(p.img)   || `img/productos/${p.id}.jpg`;
+
   /* ---------- Catálogo de productos ---------- */
   const grilla = document.getElementById("grilla-productos");
-  grilla.innerHTML = PRODUCTOS.map(p => `
-    <li data-familia="${p.familia}">
-      <button type="button" class="prod" data-abrir="${p.id}" aria-label="Ver ${p.nombre}">
+  const cajaFiltros = document.querySelector(".filtros");
+
+  const pintarProductos = () => {
+    grilla.innerHTML = PRODUCTOS.map(p => `
+    <li data-familia="${esc(p.familia)}">
+      <button type="button" class="prod" data-abrir="${esc(p.id)}" aria-label="Ver ${esc(p.nombre)}">
         <span class="prod__foto">
-          <img src="img/productos/${p.id}-sm.jpg" alt="" loading="lazy" style="object-position:${p.foco}">
+          <img src="${esc(fotoChica(p))}" alt="" loading="lazy" style="object-position:${esc(p.foco || "50% 50%")}">
         </span>
-        <span class="prod__nombre">${p.nombre}${p.nuevo ? ' <span class="etiqueta">Nuevo</span>' : ""}</span>
-        <span class="prod__familia">${p.familiaTxt}</span>
-        <span class="prod__desc">${p.desc.split(". ")[0].replace(/\.$/, "")}.</span>
+        <span class="prod__nombre">${esc(p.nombre)}${p.nuevo ? ' <span class="etiqueta">Nuevo</span>' : ""}</span>
+        <span class="prod__familia">${esc(p.familiaTxt)}</span>
+        <span class="prod__desc">${esc((p.desc || "").split(". ")[0].replace(/\.$/, ""))}.</span>
       </button>
     </li>`).join("");
+  };
 
   /* ---------- Filtros ---------- */
-  const filtros = document.querySelectorAll(".filtro");
-  filtros.forEach(btn => btn.addEventListener("click", () => {
-    filtros.forEach(b => b.setAttribute("aria-pressed", String(b === btn)));
-    const f = btn.dataset.filtro;
-    grilla.querySelectorAll("li").forEach(li => { li.hidden = f !== "todos" && li.dataset.familia !== f; });
-  }));
+  const activarFiltros = () => {
+    const filtros = cajaFiltros.querySelectorAll(".filtro");
+    filtros.forEach(btn => btn.addEventListener("click", () => {
+      filtros.forEach(b => b.setAttribute("aria-pressed", String(b === btn)));
+      const f = btn.dataset.filtro;
+      grilla.querySelectorAll("li").forEach(li => { li.hidden = f !== "todos" && li.dataset.familia !== f; });
+    }));
+  };
+
+  const pintarFiltros = categorias => {
+    cajaFiltros.innerHTML =
+      `<button type="button" class="filtro" aria-pressed="true" data-filtro="todos">Todos</button>` +
+      categorias.map(c => `<button type="button" class="filtro" aria-pressed="false" data-filtro="${esc(c.slug)}">${esc(c.nombre)}</button>`).join("");
+    activarFiltros();
+  };
+
+  pintarProductos();
+  activarFiltros();
+
+  /* ---------- Novedades ---------- */
+  const grillaNov = document.getElementById("grilla-novedades");
+
+  const idYoutube = url => {
+    const m = String(url || "").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : null;
+  };
+
+  const medioNovedad = n => {
+    const titulo = esc(n.titulo);
+    if (n.tipo_medio === "youtube" && idYoutube(n.medio_url)) {
+      return `<div class="nov__img nov__img--video nov__img--yt"><iframe src="https://www.youtube-nocookie.com/embed/${idYoutube(n.medio_url)}"
+        title="Video: ${titulo}" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
+    }
+    if (n.tipo_medio === "video" && urlSegura(n.medio_url)) {
+      return `<div class="nov__img nov__img--video"><video src="${esc(urlSegura(n.medio_url))}" autoplay muted loop playsinline
+        aria-label="Video: ${titulo}"></video></div>`;
+    }
+    const img = `<img src="${esc(urlSegura(n.medio_url))}" alt="${titulo}" loading="lazy">`;
+    return n.producto
+      ? `<button type="button" class="nov__img" data-abrir="${esc(n.producto)}" aria-label="Ver ${titulo} en grande">${img}</button>`
+      : `<div class="nov__img">${img}</div>`;
+  };
+
+  const pintarNovedades = lista => {
+    grillaNov.innerHTML = lista.map((n, i) => `
+      <article class="nov${i === 0 && n.destacada ? " nov--principal" : ""}">
+        ${medioNovedad(n)}
+        <div class="nov__cuerpo">
+          <span class="etiqueta">Nuevo</span>
+          <h3>${esc(n.titulo)}</h3>
+          ${n.descripcion ? `<p>${esc(n.descripcion)}</p>` : ""}
+          ${(n.datos || []).length ? `<dl class="datos">${n.datos.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>` : ""}
+        </div>
+      </article>`).join("");
+  };
+
+  /* ---------- Carga desde la base de datos (Supabase) ---------- */
+  const consultar = async ruta => {
+    const r = await fetch(`${window.NC_CONFIG.supabaseUrl}/rest/v1/${ruta}`, {
+      headers: { apikey: window.NC_CONFIG.supabaseKey, Accept: "application/json" }
+    });
+    if (!r.ok) throw new Error(`Supabase respondió ${r.status}`);
+    return r.json();
+  };
+
+  const cargarDesdeBase = async () => {
+    if (!window.NC_CONFIG) return;
+    try {
+      const [cats, prods, novs] = await Promise.all([
+        consultar("categorias?select=slug,nombre&order=orden"),
+        consultar("productos?select=slug,nombre,tipo,descripcion,datos,imagen_url,imagen_sm_url,foco,nuevo,categorias(slug)&visible=eq.true&order=orden"),
+        consultar("novedades?select=titulo,descripcion,datos,tipo_medio,medio_url,destacada,productos(slug)&visible=eq.true&order=orden")
+      ]);
+      if (prods.length) {
+        PRODUCTOS = prods.map(p => ({
+          id: p.slug, nombre: p.nombre, familia: p.categorias?.slug || "", familiaTxt: p.tipo || "",
+          foco: p.foco, desc: p.descripcion || "", datos: Array.isArray(p.datos) ? p.datos : [],
+          nuevo: p.nuevo, img: p.imagen_url, imgSm: p.imagen_sm_url
+        }));
+        pintarProductos();
+        if (cats.length) pintarFiltros(cats);
+      }
+      if (novs.length) {
+        pintarNovedades(novs.map(n => ({ ...n, producto: n.productos?.slug || null })));
+      }
+    } catch (err) {
+      console.warn("No se pudo leer la base de datos; se muestra la lista de respaldo.", err);
+    }
+  };
+  cargarDesdeBase();
 
   /* ---------- Detalle (modal) ---------- */
   const dlg = document.getElementById("detalle");
@@ -129,13 +225,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const abrir = id => {
     const p = PRODUCTOS.find(x => x.id === id);
     if (!p) return;
-    img.src = `img/productos/${p.id}.jpg`;
+    img.src = fotoGrande(p);
     img.alt = `Foto de ${p.nombre} Lácteos NC`;
     document.getElementById("detalle-familia").textContent = p.familiaTxt;
     document.getElementById("detalle-titulo").textContent = p.nombre;
     document.getElementById("detalle-desc").textContent = p.desc;
     document.getElementById("detalle-datos").innerHTML =
-      p.datos.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+      p.datos.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
     dlg.showModal();
   };
   document.addEventListener("click", e => {

@@ -37,7 +37,9 @@ Leer antes de empezar cualquier tarea.
 index.html      Página principal: Inicio, Institucional, Productos, Novedades, Contacto
 404.html        Página para direcciones que no existen
 css/styles.css  Estilos (colores, menú peluche/clásico, animación de leche)
-js/main.js      Menú, catálogo de productos (lista PRODUCTOS), animación y formulario
+js/config.js    URL y clave PÚBLICA de Supabase
+js/main.js      Menú, catálogo y novedades (desde Supabase, con lista de respaldo), animación y formulario
+supabase/       Migraciones SQL y documentación de la base (supabase/README.md)
 img/            Logos, fotos de productos (grande y -sm) y capas de leche (.webp)
 fonts/          Barlow, Barlow Condensed y Yellowtail, alojadas en el sitio
 robots.txt, sitemap.xml, _headers   Archivos para Google y Cloudflare
