@@ -1,0 +1,22 @@
+# Cabeceras para Cloudflare Pages (se aplican solas al publicar).
+
+# Seguridad básica para todo el sitio
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Imágenes y tipografías: el navegador las guarda 30 días
+/img/*
+  Cache-Control: public, max-age=2592000
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# CSS y JS: se guardan 1 día; al cambiarlos subí el número ?v= en index.html
+/css/*
+  Cache-Control: public, max-age=86400
+
+/js/*
+  Cache-Control: public, max-age=86400
