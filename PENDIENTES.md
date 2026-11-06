@@ -19,13 +19,10 @@ Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
 
 El código ya está publicado. Falta conectar dos servicios:
 
-- [ ] **Fer:** crear una cuenta gratis en **Resend** (resend.com) con sistemas.emancipacion@gmail.com, agregar el dominio `lacteosnc.com.ar` y aceptar que configure los registros DNS en Cloudflare (o pedirle a Claude que los cargue). Crear una **API key**.
-- [ ] **Fer:** en Cloudflare → **Turnstile** → *Add widget*: nombre "Lácteos NC", dominio `lacteosnc.com.ar`, modo *Managed*. Copiar la **Site Key** (pública) y pasársela a Claude para `js/config.js`.
-- [ ] **Fer:** en Supabase → Edge Functions → **Secrets**, cargar (las claves secretas no se pasan por el chat):
+- [ ] **Fer:** en Supabase → Edge Functions → **Secrets** cargar las 2 claves secretas (no se pasan por el chat):
   - `RESEND_API_KEY` = la API key de Resend;
-  - `MAIL_REMITENTE` = `Lácteos NC <no-responder@lacteosnc.com.ar>`;
-  - `TURNSTILE_SECRET` = la Secret Key de Turnstile;
-  - `MAIL_AVISOS` (opcional) = mail que recibe el aviso de cada cliente nuevo para activar.
+  - `TURNSTILE_SECRET` = la Secret Key del widget "Lácteos NC - registro" (Cloudflare → Turnstile → el widget → Settings).
+- [ ] **Claude:** confirmar que Resend marque el dominio `lacteosnc.com.ar` como **Verified** (los DNS ya están cargados).
 - [ ] **Claude:** cuando esté todo configurado, probar un registro real de punta a punta.
 - [ ] **Cooperativa:** revisar y aprobar el texto de los **términos y condiciones** (`/terminos/`, hoy en borrador).
 - [ ] **Opcional:** cargar cuentas de **empleados** (se registran como clientes y el administrador les pone el rol Empleado al activarlas).

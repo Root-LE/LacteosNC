@@ -234,3 +234,21 @@ Cada plan nuevo se agrega al final con la misma estructura.
 12. Prueba en navegador con datos simulados: registro con error de código y espera, compra con dos artículos (uno sin precio), confirmación con número, apertura y retiro de un pedido. Sin errores.
 
 **Archivos:** `index.html`, `css/styles.css`, `js/config.js`, `js/cuenta.js`, `admin/*`, `registro/*`, `terminos/index.html`, `clientes/*`, `pedidos/*`, `supabase/migrations/20261106_10_registro_codigos.sql`, `supabase/functions/cuentas/index.ts`, `robots.txt`, `_headers`.
+
+---
+
+## Plan 11 — Servicios para el registro: Resend, Turnstile y secretos
+
+**Fecha:** 06/11/2026 · **Estado:** casi listo (faltan las 2 claves secretas, que carga Fer)
+
+**Pasos:**
+1. Fer creó la cuenta de **Resend** (sistemas.emancipacion@gmail.com), agregó `lacteosnc.com.ar` (región São Paulo) y creó la API key.
+2. En Cloudflare → DNS se cargaron los registros que pide Resend:
+   - `resend._domainkey` (TXT, DKIM);
+   - `rsend` → `rsend-sae1.forge.rmta.net` y `send` → `send.forge.rmta.net` (CNAME, **DNS only**);
+   - `_dmarc` = `v=DMARC1; p=none;` (TXT).
+   
+   En Resend se pidió la verificación; queda "Pending" mientras propaga.
+3. Cloudflare → **Turnstile**: widget "Lácteos NC - registro", dominio `lacteosnc.com.ar`, modo *Managed*. La **Site Key** (pública) quedó en `js/config.js`; la Secret Key no se copió a ningún lado.
+4. Supabase → Edge Functions → Secrets: `MAIL_REMITENTE` = `Lácteos NC <no-responder@lacteosnc.com.ar>` y `MAIL_AVISOS` = `sistemas@laemancipacion.com.ar` (recibe el aviso de cada cliente que verifica su mail, para activarlo).
+5. Versión de `config.js` subida a `?v=7`.
