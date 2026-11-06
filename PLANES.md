@@ -189,7 +189,7 @@ Cada plan nuevo se agrega al final con la misma estructura.
    - **Novedades:** foto, enlace de YouTube o video propio (MP4/WebM, se controla que dure ≤10 s y pese ≤5 MB).
    - **Listas de precio:** crear y editar listas.
    - **Precios:** tabla por lista, edición directa y botón **Pegar desde Excel** (columnas código y precio; acepta 1.234,56).
-   - **Cuentas:** activar clientes (usuario + lista + rol), editar y bloquear. El administrador no ve ni modifica administradores; solo el superadministrador da esos roles. Nadie puede cambiar su propio rol.
+   - **Cuentas:** activar clientes (usuario + lista + rol), editar y bloquear. El administrador ve a los administradores pero no puede modificarlos; solo el superadministrador da esos roles. Nadie puede cambiar su propio rol.
    - **Cambiar mi contraseña** y **Olvidé mi contraseña** (llega un mail con enlace a `/admin/`).
 3. Los permisos reales los controla la base (RLS): aunque alguien manipule la página no puede hacer más que lo que su rol permite.
 4. Imagen de reemplazo `img/sin-foto.jpg` si una foto no carga. `robots.txt` y `_headers` excluyen `/admin/` de los buscadores. Versión subida a `?v=5`.
