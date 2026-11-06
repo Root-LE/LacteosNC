@@ -1,15 +1,16 @@
 # Pendientes — Lácteos NC
 
-Última actualización: 05/11/2026
+Última actualización: 06/11/2026
 
 Al completar algo: borrarlo de acá y anotarlo en `PLANES.md`.
 Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
 
 ## Fase 3 — Pendientes que quedaron de la base de datos
 
-- [ ] **Fer:** pasar los **códigos reales** de los 11 productos (hoy tienen códigos provisorios NC-001 a NC-011).
-- [ ] **Fer:** pasar los **precios** de cada producto para cada lista (Lista 1 precio sur, Lista 2 precio CABA, Lista 3 precio cliente), o cargarlos desde el panel cuando esté listo.
-- [ ] **Fer + Claude:** crear el primer usuario **administrador** (pasos en `supabase/README.md`).
+- [ ] **Fer:** confirmar los **11 artículos que quedaron inactivos** porque parecen de uso interno (los clientes no los ven): 31578 crema de suero, 31587 NU queso reggianito, 31543 crema de leche (sin presentación), 31604 recorte queso sardo, 77826 tybo sin bolsa, 77828 sardo sin envasar, 77825 cremoso sin bolsa, 77779 miga x kg, 31910 manteca caja (en Marcotegui), 77830 y 77831 dulce de leche Milkey.
+- [ ] **Fer:** decidir si se agregan **tarjetas a la web** (con foto) para artículos que hoy no tienen: port salut, cremoso, tybo, ricotta, manteca, cheddar, gouda, provolone, queso pizzero, barra sándwich, dulce de leche clásico, untable cheddar, sachets de crema.
+- [ ] **Fer:** pasar los **precios** de cada artículo para cada lista (Lista 1 precio sur, Lista 2 precio CABA, Lista 3 precio cliente), o cargarlos desde el panel cuando esté listo.
+- [ ] **Opcional:** activar en Supabase la protección contra contraseñas filtradas (Authentication → Policies), si el plan lo permite.
 
 ## Fase 4 — Panel de administración (`/admin`)
 

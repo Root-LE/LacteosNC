@@ -148,3 +148,27 @@ Cada plan nuevo se agrega al final con la misma estructura.
 9. Versión de CSS y JS subida a `?v=4`.
 
 **Archivos:** `supabase/migrations/*.sql`, `supabase/README.md`, `js/config.js`, `js/main.js`, `css/styles.css`, `index.html`, `404.html`.
+
+---
+
+## Plan 8 — Administradores y artículos con códigos reales
+
+**Fecha:** 06/11/2026 · **Estado:** hecho
+
+**Objetivo:** dar de alta a los administradores y cargar los códigos reales de los productos del sistema de la cooperativa.
+
+**Pasos:**
+1. **Nuevo rol superadministrador** (migraciones 05 y 06): acceso absoluto; es el único que puede asignar o quitar los roles administrador y superadministrador y modificar a otro superadministrador. El administrador carga productos, precios, novedades y archivos y activa clientes y empleados, pero no puede crear administradores. Un disparador en `perfiles` frena cualquier intento de saltear esto.
+2. Pruebas: el administrador no pudo crear administradores, ascender a un cliente, editar al superadministrador ni hacerse superadministrador; el superadministrador sí pudo todo; un cliente no pudo cambiarse el rol.
+3. **Usuarios internos** (regla: primera letra del nombre + apellido). Fer creó las cuentas en Supabase y se les asignó:
+   - **Fnardi** — Fernando Nardi — sistemas@laemancipacion.com.ar — superadministrador.
+   - **Mfernandez** — Macarena Fernandez — administracionqueseria@laemancipacion.com.ar — administrador.
+4. **Artículos** (migración 07): del Excel `productosNC.xls` (campos ARTICULO y DENOMINACION) se cargaron los **59 artículos**. Se separó en dos niveles:
+   - `productos` = las 11 tarjetas con foto de la web (sin cambios para el visitante);
+   - `articulos` = los códigos reales, que son los que tienen precio y se piden.
+   28 artículos quedaron vinculados a su tarjeta de la web (ej.: Sardo entero, porción, estacionado y pepato → "Sardo"). 11 quedaron inactivos por parecer de uso interno (ver `PENDIENTES.md`).
+5. Precios y renglones de pedido pasaron a ser **por artículo** (estaban vacíos, no se perdió nada). `crear_pedido` ahora recibe `articulo_id` y rechaza artículos inactivos.
+6. Migración 08: el cliente ve solo los precios de los artículos activos de su lista.
+7. Pruebas: visitante 0 artículos; cliente 48 artículos y 48 precios de su lista; pedido con código 31562 "QUESO SARDO NC ESTACIONADO ENTERO" correcto; pedido con artículo inactivo rechazado. Numeración de pedidos reiniciada en 1001.
+
+**Archivos:** `supabase/migrations/20261106_05` a `_08`, `supabase/README.md`.

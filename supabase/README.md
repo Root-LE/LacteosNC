@@ -14,6 +14,8 @@ las que ya se aplicaron.
 | `20261105_04_datos_iniciales.sql` | 3 listas de precio, 4 categorías, 11 productos y 3 novedades |
 | `20261106_05_superadmin_rol.sql` | Agrega el rol `superadmin` |
 | `20261106_06_superadmin_permisos.sql` | Permisos del superadministrador y protección de roles |
+| `20261106_07_articulos.sql` | Tabla de artículos con los 59 códigos reales; precios y pedidos pasan a ser por artículo |
+| `20261106_08_precios_solo_activos.sql` | El cliente ve solo precios de artículos activos |
 
 ## Tablas
 
@@ -22,11 +24,12 @@ las que ya se aplicaron.
 | `listas_precio` | Lista 1 (precio sur), Lista 2 (precio CABA), Lista 3 (precio cliente)… |
 | `perfiles` | Un registro por usuario: usuario, nombre, apellido, CUIT, email, **rol**, **estado**, lista de precio |
 | `categorias` | Familias de productos (quesos duros, semiduros, pasta hilada, cremas y dulces) |
-| `productos` | Código, nombre, tipo, descripción, datos, fotos, "Nuevo", visible, orden |
-| `precios` | Precio de cada producto en cada lista |
+| `productos` | Las tarjetas de la web: nombre, tipo, descripción, datos, fotos, "Nuevo", visible, orden |
+| `articulos` | Los códigos del sistema de la cooperativa (campo ARTICULO) con su descripción (DENOMINACION); pueden pertenecer a un producto de la web; activo/inactivo |
+| `precios` | Precio de cada **artículo** en cada lista |
 | `novedades` | Título, descripción, datos, foto / YouTube / video, producto relacionado |
 | `pedidos` | Número (desde 1001), cliente, lista, estado, observaciones, total, quién lo abrió y retiró |
-| `pedido_items` | Renglones: código, descripción, cantidad, precio unitario y subtotal (copiados al crear el pedido) |
+| `pedido_items` | Renglones: artículo, código, descripción, cantidad, precio unitario y subtotal (copiados al crear el pedido) |
 | `mensajes_contacto` | Mensajes del formulario de contacto |
 
 ## Roles y permisos
@@ -34,7 +37,7 @@ las que ya se aplicaron.
 | Quién | Qué puede hacer |
 |---|---|
 | **Visitante** (sin sesión) | Ver categorías, productos y novedades visibles. Enviar un mensaje de contacto. |
-| **Cliente** (cuenta activa) | Lo anterior + ver **solo su lista de precios**, crear pedidos y ver **solo sus pedidos**. |
+| **Cliente** (cuenta activa) | Lo anterior + ver los artículos activos con **solo su lista de precios**, crear pedidos y ver **solo sus pedidos**. |
 | **Empleado** | Ver todos los pedidos, abrirlos (pasan a *armando pedido*) y marcarlos como *pedido retirado*. |
 | **Administrador** | Todo lo anterior + cargar productos, precios, listas, novedades y archivos; activar cuentas de clientes y empleados. No puede crear administradores ni modificar a un superadministrador. |
 | **Superadministrador** | Acceso absoluto: todo lo del administrador y además asigna o quita los roles administrador y superadministrador. Es el único que puede modificar a otro superadministrador. |
@@ -51,7 +54,7 @@ Estados de un pedido: `en_espera` → (un empleado lo abre) → `armando` → `r
 
 | Función | Quién | Qué hace |
 |---|---|---|
-| `crear_pedido(p_items, p_observaciones)` | Cliente activo | Crea el pedido con los precios de su lista. `p_items` = `[{"producto_id":1,"cantidad":2}]`. Devuelve número y detalle. |
+| `crear_pedido(p_items, p_observaciones)` | Cliente activo | Crea el pedido con los precios de su lista. `p_items` = `[{"articulo_id":1,"cantidad":2}]`. Devuelve número y detalle. |
 | `detalle_pedido(p_numero)` | Dueño o personal | Devuelve el pedido con cliente y renglones. |
 | `abrir_pedido(p_numero)` | Empleado / admin | Si estaba *en espera* pasa a *armando* y devuelve el detalle. |
 | `marcar_retirado(p_numero)` | Empleado / admin | Pasa de *armando* a *retirado*. |
@@ -67,8 +70,10 @@ Estados de un pedido: `en_espera` → (un empleado lo abre) → `armando` → `r
 
 | Persona | Email | Usuario | Rol |
 |---|---|---|---|
-| Fernando | sistemas@laemancipacion.com.ar | fernando | superadmin |
-| Macarena | administracionqueseria@laemancipacion.com.ar | macarena | administrador |
+| Fernando Nardi | sistemas@laemancipacion.com.ar | Fnardi | superadmin |
+| Macarena Fernandez | administracionqueseria@laemancipacion.com.ar | Mfernandez | administrador |
+
+Regla para usuarios internos (superadmin, administrador, empleado): **primera letra del nombre + apellido** (ej.: Fernando Nardi → `Fnardi`).
 
 Para crear un administrador nuevo:
 
@@ -77,8 +82,8 @@ Para crear un administrador nuevo:
 
 ```sql
 update public.perfiles
-   set rol = 'administrador', estado = 'activa', usuario = 'macarena', nombre = 'Macarena', activado = now()
- where email = 'administracionqueseria@laemancipacion.com.ar';
+   set rol = 'empleado', estado = 'activa', usuario = 'Jperez', nombre = 'Juan', apellido = 'Perez', activado = now()
+ where email = 'juan.perez@ejemplo.com';
 ```
 
 Cuando el panel esté listo, el superadministrador podrá hacerlo desde ahí.
