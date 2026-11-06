@@ -12,6 +12,8 @@ las que ya se aplicaron.
 | `20261105_02_seguridad.sql` | Reglas por rol (RLS), alta automática de perfiles y funciones de pedidos |
 | `20261105_03_archivos.sql` | Carpetas de archivos `productos` y `novedades` |
 | `20261105_04_datos_iniciales.sql` | 3 listas de precio, 4 categorías, 11 productos y 3 novedades |
+| `20261106_05_superadmin_rol.sql` | Agrega el rol `superadmin` |
+| `20261106_06_superadmin_permisos.sql` | Permisos del superadministrador y protección de roles |
 
 ## Tablas
 
@@ -34,7 +36,8 @@ las que ya se aplicaron.
 | **Visitante** (sin sesión) | Ver categorías, productos y novedades visibles. Enviar un mensaje de contacto. |
 | **Cliente** (cuenta activa) | Lo anterior + ver **solo su lista de precios**, crear pedidos y ver **solo sus pedidos**. |
 | **Empleado** | Ver todos los pedidos, abrirlos (pasan a *armando pedido*) y marcarlos como *pedido retirado*. |
-| **Administrador** | Todo lo anterior + cargar productos, precios, listas, novedades, archivos, y activar cuentas. |
+| **Administrador** | Todo lo anterior + cargar productos, precios, listas, novedades y archivos; activar cuentas de clientes y empleados. No puede crear administradores ni modificar a un superadministrador. |
+| **Superadministrador** | Acceso absoluto: todo lo del administrador y además asigna o quita los roles administrador y superadministrador. Es el único que puede modificar a otro superadministrador. |
 
 Una cuenta que no está **activa** (pendiente de verificación, pendiente de activación o bloqueada)
 no ve precios ni puede pedir, aunque tenga sesión iniciada.
@@ -60,13 +63,22 @@ Estados de un pedido: `en_espera` → (un empleado lo abre) → `armando` → `r
 - `novedades`: fotos y videos MP4/WebM, máximo 5 MB (el panel controla que el video dure 10 s o menos).
 - Se pueden ver públicamente; solo el administrador sube, reemplaza o borra.
 
-## Crear el primer administrador
+## Usuarios administradores
 
-1. En Supabase: **Authentication → Users → Add user**, con el email y una contraseña.
-2. En **SQL Editor**, ejecutar (cambiando el email y el usuario):
+| Persona | Email | Usuario | Rol |
+|---|---|---|---|
+| Fernando | sistemas@laemancipacion.com.ar | fernando | superadmin |
+| Macarena | administracionqueseria@laemancipacion.com.ar | macarena | administrador |
+
+Para crear un administrador nuevo:
+
+1. En Supabase: **Authentication → Users → Add user → Create new user**, con el email y una contraseña, tildando **Auto Confirm User**.
+2. En **SQL Editor**, ejecutar (cambiando email, usuario, nombre y rol):
 
 ```sql
 update public.perfiles
-   set rol = 'administrador', estado = 'activa', usuario = 'fer', activado = now()
- where email = 'tu-email@ejemplo.com';
+   set rol = 'administrador', estado = 'activa', usuario = 'macarena', nombre = 'Macarena', activado = now()
+ where email = 'administracionqueseria@laemancipacion.com.ar';
 ```
+
+Cuando el panel esté listo, el superadministrador podrá hacerlo desde ahí.
