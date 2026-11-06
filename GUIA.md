@@ -33,6 +33,7 @@ Leer antes de empezar cualquier tarea.
 | Teléfono casa central | (02924) 420303 |
 | Compras (planta) | (02923) 436876 · info@laemancipacion.com.ar |
 | Administración (planta) | (02924) 401142 · administracionqueseria@laemancipacion.com.ar |
+| Panel de administración | https://lacteosnc.com.ar/admin/ (solo administradores y superadministradores) |
 | Usuarios internos | Fnardi (superadmin), Mfernandez (administrador). Regla: inicial del nombre + apellido |
 
 ## 3. Estructura del sitio
@@ -43,6 +44,7 @@ index.html      Página principal: Inicio, Institucional, Productos, Novedades, 
 css/styles.css  Estilos (colores, menú peluche/clásico, animación de leche)
 js/config.js    URL y clave PÚBLICA de Supabase
 js/main.js      Menú, catálogo y novedades (desde Supabase, con lista de respaldo), animación y formulario
+admin/          Panel de administración (productos, artículos, novedades, listas, precios, cuentas)
 supabase/       Migraciones SQL y documentación de la base (supabase/README.md)
 img/            Logos, fotos de productos (grande y -sm) y capas de leche (.webp)
 fonts/          Barlow, Barlow Condensed y Yellowtail, alojadas en el sitio

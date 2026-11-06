@@ -16,6 +16,7 @@ las que ya se aplicaron.
 | `20261106_06_superadmin_permisos.sql` | Permisos del superadministrador y protección de roles |
 | `20261106_07_articulos.sql` | Tabla de artículos con los 59 códigos reales; precios y pedidos pasan a ser por artículo |
 | `20261106_08_precios_solo_activos.sql` | El cliente ve solo precios de artículos activos |
+| `20261106_09_limpieza_y_tarjetas.sql` | Borra 11 artículos internos, categoría Blandos y 13 tarjetas nuevas ocultas |
 
 ## Tablas
 

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel de administración | Lácteos NC</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="stylesheet" href="admin.css?v=1">
+<script src="vendor/supabase-2.119.0.js"></script>
+<script src="/js/config.js?v=5"></script>
+<script src="admin.js?v=1" defer></script>
+</head>
+<body>
+
+<!-- ============================================================ INGRESO -->
+<main class="ingreso" id="vista-ingreso" hidden>
+  <form class="ingreso__caja" id="form-ingreso" novalidate>
+    <img src="/img/logo-nc.png" alt="Lácteos NC" width="96" height="96">
+    <h1>Panel de administración</h1>
+    <p class="ingreso__ayuda">Ingresá con tu email y contraseña.</p>
+
+    <label for="i-email">Email</label>
+    <input id="i-email" type="email" autocomplete="username" required>
+
+    <label for="i-clave">Contraseña</label>
+    <input id="i-clave" type="password" autocomplete="current-password" required>
+
+    <p class="error" id="ingreso-error" role="alert" hidden></p>
+    <button class="btn btn--rojo btn--ancho" type="submit">Ingresar</button>
+    <button class="enlace" type="button" id="btn-olvide">Olvidé mi contraseña</button>
+  </form>
+
+  <form class="ingreso__caja" id="form-nueva-clave" hidden novalidate>
+    <img src="/img/logo-nc.png" alt="Lácteos NC" width="96" height="96">
+    <h1>Elegí una contraseña nueva</h1>
+    <label for="n-clave">Contraseña nueva (mínimo 8 caracteres)</label>
+    <input id="n-clave" type="password" autocomplete="new-password" minlength="8" required>
+    <label for="n-clave2">Repetí la contraseña</label>
+    <input id="n-clave2" type="password" autocomplete="new-password" minlength="8" required>
+    <p class="error" id="nueva-error" role="alert" hidden></p>
+    <button class="btn btn--rojo btn--ancho" type="submit">Guardar contraseña</button>
+  </form>
+</main>
+
+<!-- ============================================================== PANEL -->
+<div class="panel" id="vista-panel" hidden>
+  <header class="barra">
+    <a class="barra__marca" href="/" title="Ver el sitio">
+      <img src="/img/logo-nc.png" alt="" width="40" height="40">
+      <span>Panel Lácteos NC</span>
+    </a>
+    <div class="barra__usuario">
+      <span id="usuario-nombre"></span>
+      <span class="chip" id="usuario-rol"></span>
+      <button class="btn btn--linea btn--chico" type="button" id="btn-mi-clave">Cambiar mi contraseña</button>
+      <button class="btn btn--linea btn--chico" type="button" id="btn-salir">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <nav class="menu" aria-label="Secciones del panel">
+    <a href="#productos">Productos de la web</a>
+    <a href="#articulos">Artículos</a>
+    <a href="#novedades">Novedades</a>
+    <a href="#listas">Listas de precio</a>
+    <a href="#precios">Precios</a>
+    <a href="#cuentas">Cuentas</a>
+  </nav>
+
+  <main class="contenido" id="contenido" tabindex="-1"></main>
+</div>
+
+<!-- Ventana de edición reutilizable -->
+<dialog class="ventana" id="ventana">
+  <form method="dialog" class="ventana__form" id="ventana-form" novalidate>
+    <header class="ventana__cabecera">
+      <h2 id="ventana-titulo"></h2>
+      <button type="button" class="ventana__cerrar" id="ventana-cerrar" aria-label="Cerrar">&times;</button>
+    </header>
+    <div class="ventana__cuerpo" id="ventana-cuerpo"></div>
+    <p class="error" id="ventana-error" role="alert" hidden></p>
+    <footer class="ventana__pie" id="ventana-pie"></footer>
+  </form>
+</dialog>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<noscript><p class="error">El panel necesita JavaScript activado.</p></noscript>
+</body>
+</html>

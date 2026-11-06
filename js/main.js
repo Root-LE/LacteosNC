@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <li data-familia="${esc(p.familia)}">
       <button type="button" class="prod" data-abrir="${esc(p.id)}" aria-label="Ver ${esc(p.nombre)}">
         <span class="prod__foto">
-          <img src="${esc(fotoChica(p))}" alt="" loading="lazy" style="object-position:${esc(p.foco || "50% 50%")}">
+          <img src="${esc(fotoChica(p))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='img/sin-foto.jpg'" style="object-position:${esc(p.foco || "50% 50%")}">
         </span>
         <span class="prod__nombre">${esc(p.nombre)}${p.nuevo ? ' <span class="etiqueta">Nuevo</span>' : ""}</span>
         <span class="prod__familia">${esc(p.familiaTxt)}</span>
@@ -225,6 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const abrir = id => {
     const p = PRODUCTOS.find(x => x.id === id);
     if (!p) return;
+    img.onerror = () => { img.onerror = null; img.src = "img/sin-foto.jpg"; };
     img.src = fotoGrande(p);
     img.alt = `Foto de ${p.nombre} Lácteos NC`;
     document.getElementById("detalle-familia").textContent = p.familiaTxt;

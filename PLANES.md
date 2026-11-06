@@ -172,3 +172,27 @@ Cada plan nuevo se agrega al final con la misma estructura.
 7. Pruebas: visitante 0 artículos; cliente 48 artículos y 48 precios de su lista; pedido con código 31562 "QUESO SARDO NC ESTACIONADO ENTERO" correcto; pedido con artículo inactivo rechazado. Numeración de pedidos reiniciada en 1001.
 
 **Archivos:** `supabase/migrations/20261106_05` a `_08`, `supabase/README.md`.
+
+---
+
+## Plan 9 — Limpieza de artículos, tarjetas nuevas y panel de administración
+
+**Fecha:** 06/11/2026 · **Estado:** hecho (falta que Fer y Macarena prueben con sus cuentas)
+
+**Objetivo:** que Fernando y Macarena carguen productos, fotos, videos y precios sin tocar código.
+
+**Pasos:**
+1. **Migración 09:** se eliminaron los 11 artículos de uso interno (31578, 31587, 31543, 31604, 77826, 77825, 77828, 77779, 31910, 77830, 77831). Nueva categoría **Blandos**. Se crearon **13 tarjetas nuevas ocultas** (port salut, cremoso, ricotta, tybo, gouda, cheddar, barra sándwich, provolone, queso pizzero, manteca, crema gran formato, dulce de leche clásico, untable cheddar) y se vincularon los artículos. Quedan 48 artículos (todos con tarjeta) y 24 tarjetas (11 visibles). Las nuevas se publican cuando se les sube la foto.
+2. **Panel en `https://lacteosnc.com.ar/admin/`** (`admin/index.html`, `admin/admin.css`, `admin/admin.js`, `admin/vendor/supabase-2.119.0.js`). Solo entran cuentas **activas** con rol administrador o superadministrador. Secciones:
+   - **Productos de la web:** crear, editar, ocultar y eliminar tarjetas; la foto se achica sola (1400 px y versión chica de 720 px) y se sube al Storage; no deja publicar una tarjeta sin foto.
+   - **Artículos:** códigos del sistema, descripción, tarjeta a la que pertenecen y activo/inactivo, con buscador.
+   - **Novedades:** foto, enlace de YouTube o video propio (MP4/WebM, se controla que dure ≤10 s y pese ≤5 MB).
+   - **Listas de precio:** crear y editar listas.
+   - **Precios:** tabla por lista, edición directa y botón **Pegar desde Excel** (columnas código y precio; acepta 1.234,56).
+   - **Cuentas:** activar clientes (usuario + lista + rol), editar y bloquear. El administrador no ve ni modifica administradores; solo el superadministrador da esos roles. Nadie puede cambiar su propio rol.
+   - **Cambiar mi contraseña** y **Olvidé mi contraseña** (llega un mail con enlace a `/admin/`).
+3. Los permisos reales los controla la base (RLS): aunque alguien manipule la página no puede hacer más que lo que su rol permite.
+4. Imagen de reemplazo `img/sin-foto.jpg` si una foto no carga. `robots.txt` y `_headers` excluyen `/admin/` de los buscadores. Versión subida a `?v=5`.
+5. Prueba local con datos simulados: las 6 secciones cargan sin errores.
+
+**Archivos:** `supabase/migrations/20261106_09_limpieza_y_tarjetas.sql`, `admin/*`, `img/sin-foto.jpg`, `js/main.js`, `robots.txt`, `_headers`, `index.html`, `404.html`.
