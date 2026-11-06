@@ -229,6 +229,8 @@ Cada plan nuevo se agrega al final con la misma estructura.
    - Al abrir un pedido en espera pasa solo a **armando pedido**. Muestra cliente, CUIT, observaciones y renglones.
    - Botones **Marcar como retirado** e **Imprimir**.
 9. `robots.txt` y `_headers`: `/clientes/` y `/pedidos/` fuera de los buscadores. Versión `?v=6`.
-10. Prueba en navegador con datos simulados: registro con error de código y espera, compra con dos artículos (uno sin precio), confirmación con número, apertura y retiro de un pedido. Sin errores.
+10. Supabase → Authentication → Sign In / Providers: **desactivado "Allow new users to sign up"** (con permiso de Fer), para que nadie cree cuentas salteando el código y el "no soy un robot". La web registra a través de la función del servidor, así que sigue funcionando. "Confirm email" queda activado.
+11. Verificado en el sitio publicado: botón Login, `/registro/`, `/terminos/`, `/clientes/` y `/pedidos/` responden; la función `cuentas` contesta y, sin las claves cargadas, se niega a crear cuentas ("todavía no está configurado"); `/pedidos/` funcionó con la sesión real de Fnardi.
+12. Prueba en navegador con datos simulados: registro con error de código y espera, compra con dos artículos (uno sin precio), confirmación con número, apertura y retiro de un pedido. Sin errores.
 
 **Archivos:** `index.html`, `css/styles.css`, `js/config.js`, `js/cuenta.js`, `admin/*`, `registro/*`, `terminos/index.html`, `clientes/*`, `pedidos/*`, `supabase/migrations/20261106_10_registro_codigos.sql`, `supabase/functions/cuentas/index.ts`, `robots.txt`, `_headers`.

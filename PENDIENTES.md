@@ -26,7 +26,6 @@ El código ya está publicado. Falta conectar dos servicios:
   - `MAIL_REMITENTE` = `Lácteos NC <no-responder@lacteosnc.com.ar>`;
   - `TURNSTILE_SECRET` = la Secret Key de Turnstile;
   - `MAIL_AVISOS` (opcional) = mail que recibe el aviso de cada cliente nuevo para activar.
-- [ ] **Claude (con permiso):** en Supabase → Authentication → Sign In / Providers, desactivar "Allow new users to sign up", para que nadie pueda registrarse salteando el código y el "no soy un robot" (las cuentas se siguen creando desde la web y desde el panel de Supabase).
 - [ ] **Claude:** cuando esté todo configurado, probar un registro real de punta a punta.
 - [ ] **Cooperativa:** revisar y aprobar el texto de los **términos y condiciones** (`/terminos/`, hoy en borrador).
 - [ ] **Opcional:** cargar cuentas de **empleados** (se registran como clientes y el administrador les pone el rol Empleado al activarlas).
