@@ -18,6 +18,7 @@ las que ya se aplicaron.
 | `20261106_08_precios_solo_activos.sql` | El cliente ve solo precios de artículos activos |
 | `20261106_09_limpieza_y_tarjetas.sql` | Borra 11 artículos internos, categoría Blandos y 13 tarjetas nuevas ocultas |
 | `20261106_10_registro_codigos.sql` | Tabla `verificaciones` y funciones del código de 6 dígitos (solo las usa la Edge Function) |
+| `20261106_11_eventos.sql` | Tabla `eventos` (novedades para el bot), disparadores y función `marcar_eventos` |
 
 ## Tablas
 
@@ -33,6 +34,7 @@ las que ya se aplicaron.
 | `pedidos` | Número (desde 1001), cliente, lista, estado, observaciones, total, quién lo abrió y retiró |
 | `pedido_items` | Renglones: artículo, código, descripción, cantidad, precio unitario y subtotal (copiados al crear el pedido) |
 | `mensajes_contacto` | Mensajes del formulario de contacto |
+| `eventos` | Novedades automáticas para el bot: cliente para activar, cuenta activada o bloqueada, pedido nuevo, armando y retirado (con los datos completos en `datos`) |
 | `verificaciones` | Código de verificación de cada registro pendiente (guardado cifrado), errores, esperas y bloqueos. Nadie la ve salvo el servidor |
 
 ## Roles y permisos
@@ -106,3 +108,21 @@ Código en `supabase/functions/cuentas/index.ts`, publicada en
 
 **Secretos** (Supabase → Edge Functions → Secrets): `RESEND_API_KEY`, `MAIL_REMITENTE`, `TURNSTILE_SECRET` y, opcional, `MAIL_AVISOS`.
 Sin ellos la función responde "todavía no está configurado" y no crea cuentas.
+
+## Novedades para el bot (`eventos`)
+
+Los guarda la base sola (disparadores), pase lo que pase en la web:
+
+| `tipo` | Cuándo | `datos` |
+|---|---|---|
+| `cliente_para_activar` | un cliente verificó su email | usuario, nombre, apellido, email, CUIT |
+| `cuenta_activada` / `cuenta_bloqueada` | un administrador activó o bloqueó una cuenta | lo mismo + rol, lista y estado anterior |
+| `pedido_nuevo` | un cliente confirmó un pedido | número, total, observaciones, cliente y renglones (código, descripción, cantidad, precio) |
+| `pedido_armando` / `pedido_retirado` | cambió el estado del pedido | lo mismo + `por` (usuario que lo cambió) |
+
+**Cómo lo usa el bot:**
+1. Lee los pendientes: `GET /rest/v1/eventos?procesado=is.null&order=id` (o se suscribe en tiempo real con Supabase Realtime a los `INSERT` de `eventos`).
+2. Hace su tarea (avisar por WhatsApp, Telegram, cargar en el sistema, etc.).
+3. Los marca: `POST /rest/v1/rpc/marcar_eventos` con `{"p_ids": [1,2,3], "p_por": "bot"}`.
+
+**Acceso:** el bot corre en un servidor y usa la clave **secret / service_role** de Supabase (Project Settings → API Keys). Esa clave **nunca** va en la página web ni en el repositorio: se guarda como variable de entorno del bot. Visitantes y clientes no pueden leer esta tabla; los administradores la ven en el panel → **Actividad**.

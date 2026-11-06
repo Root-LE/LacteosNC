@@ -67,7 +67,7 @@ PLANES.md       Lo que ya se hizo, plan por plan, con sus pasos
 - **Colores:** rojo NC `#E1141C`, blanco, gris leche `#F2F4F7`, azul de etiquetas `#1F2C7A`, madera `#2A1B15` (fondo de Novedades), tinta `#231F20`.
 - **Tipografías:** Barlow Condensed (títulos), Barlow (texto), Yellowtail (solo la palabra "Lácteos" de la portada).
 - **Recursos de marca:** corchetes rojos en las esquinas y franja roja en diagonal (tomados de las fotos de producto).
-- **Menú:** estilo peluche activo (`nav--peluche`); alternativa estilo Convertir (`nav--clasico`).
+- **Menú:** estilo Convertir activo (`nav--clasico`); alternativa estilo peluche (`nav--peluche`).
 
 ## 5. Planes gratuitos: límites a tener en cuenta
 

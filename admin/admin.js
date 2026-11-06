@@ -692,11 +692,51 @@
     });
   };
 
+  /* ---------- Actividad (eventos para el bot) ---------- */
+  const TIPOS_EVENTO = {
+    cliente_para_activar: ["Cliente para activar", "chip--ambar"],
+    cuenta_activada: ["Cuenta activada", "chip--verde"],
+    cuenta_bloqueada: ["Cuenta bloqueada", "chip--rojo"],
+    pedido_nuevo: ["Pedido nuevo", "chip--ambar"],
+    pedido_armando: ["Pedido armando", "chip"],
+    pedido_retirado: ["Pedido retirado", "chip--verde"]
+  };
+  let soloPendientes = true;
+  const seccionActividad = async () => {
+    let consulta = sb.from("eventos").select("id, tipo, datos, pedido_numero, creado, procesado, procesado_por").order("id", { ascending: false }).limit(200);
+    if (soloPendientes) consulta = consulta.is("procesado", null);
+    const evs = await q(consulta);
+    const quien = d => { const c = d.cliente || d; return [c.usuario, [c.nombre, c.apellido].filter(Boolean).join(" "), c.email].filter(Boolean).join(" · "); };
+    const fecha = f => new Date(f).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+    contenido.innerHTML = cabecera("Actividad",
+      "Registro automático de novedades: clientes para activar, cuentas activadas y pedidos. Es lo que va a leer el bot; cuando el bot (o vos) lo procesa, se marca como <strong>procesado</strong>.",
+      `<button class="btn btn--linea" id="marcar-todos"${evs.some(e => !e.procesado) ? "" : " disabled"}>Marcar todo como procesado</button>`) + `
+      <div class="herramientas"><label class="check" style="margin:0"><input type="checkbox" id="solo-pend"${soloPendientes ? " checked" : ""}> Ver solo sin procesar</label>
+        <span class="ayuda">${evs.length} evento${evs.length === 1 ? "" : "s"}</span></div>
+      <div class="tabla-caja"><table>
+        <thead><tr><th>Fecha</th><th>Novedad</th><th>Detalle</th><th>Estado</th><th></th></tr></thead>
+        <tbody>${evs.length ? evs.map(e => `<tr>
+          <td>${esc(fecha(e.creado))}</td>
+          <td><span class="chip ${TIPOS_EVENTO[e.tipo]?.[1] || ""}">${esc(TIPOS_EVENTO[e.tipo]?.[0] || e.tipo)}</span></td>
+          <td>${e.pedido_numero ? `<strong>Pedido ${e.pedido_numero}</strong> · ${(e.datos.items || []).length} renglón(es) · ` : ""}${esc(quien(e.datos))}</td>
+          <td>${e.procesado ? `<span class="chip chip--gris">Procesado${e.procesado_por ? " por " + esc(e.procesado_por) : ""}</span>` : '<span class="chip chip--ambar">Sin procesar</span>'}</td>
+          <td class="acciones">${e.tipo === "cliente_para_activar" ? '<a class="btn btn--linea btn--chico" href="#cuentas">Activar</a> ' : ""}${e.pedido_numero ? `<a class="btn btn--linea btn--chico" href="/pedidos/#todos">Ver</a> ` : ""}${e.procesado ? "" : `<button class="btn btn--linea btn--chico" data-marcar="${e.id}">Procesado</button>`}</td>
+        </tr>`).join("") : '<tr><td colspan="5" class="vacio">No hay novedades sin procesar.</td></tr>'}</tbody>
+      </table></div>`;
+    $("#solo-pend").onchange = e => { soloPendientes = e.target.checked; seccionActividad(); };
+    const marcar = async ids => {
+      try { await q(sb.rpc("marcar_eventos", { p_ids: ids })); avisar("Marcado como procesado."); seccionActividad(); }
+      catch (ex) { avisar(mensajeError(ex), true); }
+    };
+    $("#marcar-todos").onclick = () => marcar(evs.filter(e => !e.procesado).map(e => e.id));
+    contenido.querySelectorAll("[data-marcar]").forEach(b => b.onclick = () => marcar([Number(b.dataset.marcar)]));
+  };
+
   /* =====================================================================
      NAVEGACIÓN, SESIÓN E INGRESO
      ===================================================================== */
   const SECCIONES = { productos: seccionProductos, articulos: seccionArticulos, novedades: seccionNovedades,
-    listas: seccionListas, precios: seccionPrecios, cuentas: seccionCuentas };
+    listas: seccionListas, precios: seccionPrecios, cuentas: seccionCuentas, actividad: seccionActividad };
 
   const irA = async () => {
     const nombre = SECCIONES[location.hash.slice(1)] ? location.hash.slice(1) : "productos";

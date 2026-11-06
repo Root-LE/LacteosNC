@@ -239,7 +239,7 @@ Cada plan nuevo se agrega al final con la misma estructura.
 
 ## Plan 11 — Servicios para el registro: Resend, Turnstile y secretos
 
-**Fecha:** 06/11/2026 · **Estado:** casi listo (faltan las 2 claves secretas, que carga Fer)
+**Fecha:** 06/11/2026 · **Estado:** hecho
 
 **Pasos:**
 1. Fer creó la cuenta de **Resend** (sistemas.emancipacion@gmail.com), agregó `lacteosnc.com.ar` (región São Paulo) y creó la API key.
@@ -252,3 +252,25 @@ Cada plan nuevo se agrega al final con la misma estructura.
 3. Cloudflare → **Turnstile**: widget "Lácteos NC - registro", dominio `lacteosnc.com.ar`, modo *Managed*. La **Site Key** (pública) quedó en `js/config.js`; la Secret Key no se copió a ningún lado.
 4. Supabase → Edge Functions → Secrets: `MAIL_REMITENTE` = `Lácteos NC <no-responder@lacteosnc.com.ar>` y `MAIL_AVISOS` = `sistemas@laemancipacion.com.ar` (recibe el aviso de cada cliente que verifica su mail, para activarlo).
 5. Versión de `config.js` subida a `?v=7`.
+6. Fer cargó `RESEND_API_KEY` y `TURNSTILE_SECRET`. Comprobado: los 4 secretos están en Supabase; la función rechaza un "no soy un robot" falso (o sea, lee la clave de Turnstile) y el widget aparece en `/registro/`.
+
+---
+
+## Plan 12 — Menú estilo Convertir y registro de novedades para el bot
+
+**Fecha:** 06/11/2026 · **Estado:** hecho
+
+**Pasos:**
+1. Menú del sitio: `nav--peluche` → **`nav--clasico`** en `index.html` (botón rojo rectangular con texto blanco al pasar el mouse). El botón Login conserva su contorno rojo redondeado.
+2. **Migración 11 — `eventos`:** tabla de novedades que llenan disparadores de la base:
+   - cliente para activar;
+   - cuenta activada y cuenta bloqueada;
+   - pedido nuevo, con sus renglones; se registra al cerrar la transacción, cuando ya tiene los ítems;
+   - pedido armando y pedido retirado, con quién lo cambió.
+   
+   Además: función `marcar_eventos` para marcarlos como procesados y Supabase Realtime activado en la tabla.
+3. Pruebas en la base (todo deshecho al terminar): un cliente simulado generó, en orden, `cliente_para_activar → cuenta_activada → pedido_nuevo (1 renglón) → pedido_armando (por Fnardi) → pedido_retirado (por Fnardi)`; `marcar_eventos` marcó los 5. Un cliente ve 0 eventos y no puede marcarlos; un visitante no tiene acceso.
+4. Panel → nueva sección **Actividad**: lista de novedades (solo sin procesar o todas), botón para marcarlas como procesadas y accesos a Cuentas y Pedidos.
+5. Cómo conecta el bot: ver `supabase/README.md` → "Novedades para el bot".
+
+**Archivos:** `index.html`, `supabase/migrations/20261106_11_eventos.sql`, `admin/admin.js`, `admin/index.html`, `supabase/README.md`.
