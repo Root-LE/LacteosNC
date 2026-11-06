@@ -6,13 +6,13 @@ Leer antes de empezar cualquier tarea.
 ## 1. Reglas de trabajo
 
 1. **Responder siempre en español.**
-2. **Publicar = subir a la rama `main` de GitHub**: Cloudflare Pages publica solo cada cambio en uno o dos minutos. Probar antes en la carpeta local.
+2. **Publicar = subir a la rama `main` de GitHub** (GitHub Desktop: *Commit to main* → *Push origin*, o editar en github.com). Cloudflare Pages publica solo cada cambio en uno o dos minutos. Trabajar siempre sobre la copia clonada del repositorio, no sobre la carpeta vieja `convertir\lacteosnc`.
 3. **Antes de empezar**, leer `PENDIENTES.md` para saber qué falta y `PLANES.md` para saber qué ya está hecho y cómo.
 4. **Al terminar una tarea**:
    - sacarla de `PENDIENTES.md` (o marcarla como hecha),
    - agregar en `PLANES.md` el plan implementado con sus pasos.
 5. **No tener abiertos en un editor** (VS Code, Notepad++, etc.) los archivos que se están modificando por otro lado: al guardar, el editor pisa los cambios nuevos con la versión vieja. Ya pasó una vez con `index.html`.
-6. **Al cambiar `css/styles.css` o `js/main.js`**, subir el número de versión en los enlaces de `index.html` y `404.html` (`?v=3` → `?v=4`). Si no, los visitantes siguen viendo la versión vieja guardada en su navegador.
+6. **Al cambiar `css/styles.css` o `js/main.js`**, subir el número de versión en los enlaces de `index.html` y `404.html` (`?v=4` → `?v=5`). Si no, los visitantes siguen viendo la versión vieja guardada en su navegador.
 7. **Probar en el navegador con Ctrl + F5** (recarga sin caché) después de cada cambio.
 8. **Nunca subir contraseñas ni claves secretas** al repositorio. La clave pública (anon/publishable) de Supabase sí puede ir en el código; la `service_role` jamás.
 9. Hacer los cambios de base de datos en Supabase siempre con **migraciones** (archivos SQL con nombre y fecha), nunca a mano sin dejar registro.
@@ -30,7 +30,10 @@ Leer antes de empezar cualquier tarea.
 | Servidores DNS de Cloudflare | `brynne.ns.cloudflare.com` y `kanye.ns.cloudflare.com` |
 | Base de datos, usuarios y archivos | Supabase, proyecto **LacteosNC** (`clztzhkjjulnmdaiobgl`), plan Free |
 | Mail de contacto (provisorio) | `info@laemancipacion.com.ar` |
-| Teléfono | (02924) 420303 |
+| Teléfono casa central | (02924) 420303 |
+| Compras (planta) | (02923) 436876 · info@laemancipacion.com.ar |
+| Administración (planta) | (02924) 401142 · administracionqueseria@laemancipacion.com.ar |
+| Usuarios internos | Fnardi (superadmin), Mfernandez (administrador). Regla: inicial del nombre + apellido |
 
 ## 3. Estructura del sitio
 
