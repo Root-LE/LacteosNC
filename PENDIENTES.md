@@ -14,7 +14,6 @@ Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
 ## Fase 4 — Panel de administración (`/admin`)
 
 - [ ] **Fer y Macarena:** entrar a `https://lacteosnc.com.ar/admin/` con su email y contraseña y probar cada sección.
-- [ ] **Claude:** cargar en Supabase (Authentication → URL Configuration) el Site URL `https://lacteosnc.com.ar` y la dirección de retorno `https://lacteosnc.com.ar/admin/`, para que funcione "Olvidé mi contraseña".
 
 ## Fase 5 — Clientes y pedidos
 

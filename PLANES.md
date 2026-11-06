@@ -193,6 +193,7 @@ Cada plan nuevo se agrega al final con la misma estructura.
    - **Cambiar mi contraseña** y **Olvidé mi contraseña** (llega un mail con enlace a `/admin/`).
 3. Los permisos reales los controla la base (RLS): aunque alguien manipule la página no puede hacer más que lo que su rol permite.
 4. Imagen de reemplazo `img/sin-foto.jpg` si una foto no carga. `robots.txt` y `_headers` excluyen `/admin/` de los buscadores. Versión subida a `?v=5`.
-5. Prueba local con datos simulados: las 6 secciones cargan sin errores.
+5. Prueba local con datos simulados: las 6 secciones cargan sin errores. Publicado y verificado en `https://lacteosnc.com.ar/admin/`.
+6. Supabase → Authentication → URL Configuration: Site URL `https://lacteosnc.com.ar` y dirección de retorno `https://lacteosnc.com.ar/admin/` (para el mail de recuperar contraseña).
 
 **Archivos:** `supabase/migrations/20261106_09_limpieza_y_tarjetas.sql`, `admin/*`, `img/sin-foto.jpg`, `js/main.js`, `robots.txt`, `_headers`, `index.html`, `404.html`.
