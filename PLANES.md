@@ -248,7 +248,7 @@ Cada plan nuevo se agrega al final con la misma estructura.
    - `rsend` → `rsend-sae1.forge.rmta.net` y `send` → `send.forge.rmta.net` (CNAME, **DNS only**);
    - `_dmarc` = `v=DMARC1; p=none;` (TXT).
    
-   En Resend se pidió la verificación; queda "Pending" mientras propaga.
+   Resend verificó el dominio a los pocos minutos: estado **Verified** (06/11/2026 17:50).
 3. Cloudflare → **Turnstile**: widget "Lácteos NC - registro", dominio `lacteosnc.com.ar`, modo *Managed*. La **Site Key** (pública) quedó en `js/config.js`; la Secret Key no se copió a ningún lado.
 4. Supabase → Edge Functions → Secrets: `MAIL_REMITENTE` = `Lácteos NC <no-responder@lacteosnc.com.ar>` y `MAIL_AVISOS` = `sistemas@laemancipacion.com.ar` (recibe el aviso de cada cliente que verifica su mail, para activarlo).
 5. Versión de `config.js` subida a `?v=7`.

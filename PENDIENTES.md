@@ -22,7 +22,6 @@ El código ya está publicado. Falta conectar dos servicios:
 - [ ] **Fer:** en Supabase → Edge Functions → **Secrets** cargar las 2 claves secretas (no se pasan por el chat):
   - `RESEND_API_KEY` = la API key de Resend;
   - `TURNSTILE_SECRET` = la Secret Key del widget "Lácteos NC - registro" (Cloudflare → Turnstile → el widget → Settings).
-- [ ] **Claude:** confirmar que Resend marque el dominio `lacteosnc.com.ar` como **Verified** (los DNS ya están cargados).
 - [ ] **Claude:** cuando esté todo configurado, probar un registro real de punta a punta.
 - [ ] **Cooperativa:** revisar y aprobar el texto de los **términos y condiciones** (`/terminos/`, hoy en borrador).
 - [ ] **Opcional:** cargar cuentas de **empleados** (se registran como clientes y el administrador les pone el rol Empleado al activarlas).
