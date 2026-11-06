@@ -35,7 +35,9 @@ Leer antes de empezar cualquier tarea.
 | Administración (planta) | (02924) 401142 · administracionqueseria@laemancipacion.com.ar |
 | Login (ingreso único) | https://lacteosnc.com.ar/admin/ — clientes van a `/clientes/`, empleados a `/pedidos/`, administradores al panel |
 | Registro de clientes | https://lacteosnc.com.ar/registro/ |
-| Mails | Resend (pendiente de configurar). Remitente previsto: `no-responder@lacteosnc.com.ar` |
+| Mails | Resend (dominio verificado). Remitente `no-responder@lacteosnc.com.ar`; avisos de clientes nuevos a `sistemas@laemancipacion.com.ar` |
+| "No soy un robot" | Cloudflare Turnstile, widget "Lácteos NC - registro" |
+| Novedades para el bot | Tabla `eventos` en Supabase (ver `supabase/README.md`); en el panel, sección Actividad |
 | Usuarios internos | Fnardi (superadmin), Mfernandez (administrador). Regla: inicial del nombre + apellido |
 
 ## 3. Estructura del sitio
