@@ -170,6 +170,17 @@
   const idYoutube = url => (String(url || "").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/) || [])[1] || null;
   const fotoDe = u => (u && /^(https:\/\/|\/)/.test(u)) ? u : "/img/sin-foto.jpg";
 
+  // Mail al cliente avisando que su cuenta está activa (función del servidor "cuentas")
+  const avisarActivacion = async perfilId => {
+    const { data } = await sb.auth.getSession();
+    const r = await fetch(`${window.NC_CONFIG.supabaseUrl}/functions/v1/cuentas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: window.NC_CONFIG.supabaseKey, Authorization: `Bearer ${data.session?.access_token}` },
+      body: JSON.stringify({ accion: "avisar_activacion", perfil_id: perfilId })
+    });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || "Error del servidor.");
+  };
+
   /* =====================================================================
      SECCIONES
      ===================================================================== */
@@ -667,7 +678,14 @@
           avisar("Cuenta bloqueada.");
         } else {
           await q(sb.rpc("activar_cuenta", { p_perfil_id: c.id, p_usuario: usuario, p_lista_id: lista, p_rol: rol }));
-          avisar(c.estado === "activa" ? "Cuenta actualizada." : "Cuenta activada.");
+          if (c.estado === "pendiente_activacion") {
+            try {
+              await avisarActivacion(c.id);
+              avisar("Cuenta activada. Le enviamos un mail avisándole.");
+            } catch (ex) {
+              avisar(`Cuenta activada, pero no se pudo enviar el mail: ${mensajeError(ex)}`, true);
+            }
+          } else avisar(c.estado === "activa" ? "Cuenta actualizada." : "Cuenta activada.");
         }
         seccionCuentas();
       }
@@ -700,17 +718,26 @@
     try {
       perfil = await q(sb.from("perfiles").select("id, usuario, nombre, apellido, rol, estado").eq("id", session.user.id).single());
     } catch { perfil = null; }
-    if (!perfil || perfil.estado !== "activa" || !["administrador", "superadmin"].includes(perfil.rol)) {
+    const rechazar = async texto => {
       await sb.auth.signOut();
       perfil = null;
       mostrar("ingreso");
       const e = $("#ingreso-error");
-      e.textContent = "Tu cuenta no tiene permiso para usar el panel de administración.";
+      e.innerHTML = texto;
       e.hidden = false;
-      return;
+    };
+    if (!perfil) return rechazar("No encontramos los datos de tu cuenta. Comunicate con la cooperativa.");
+    if (perfil.estado === "bloqueada") return rechazar("Tu cuenta está bloqueada. Comunicate con la cooperativa.");
+    if (perfil.estado === "pendiente_activacion") {
+      return rechazar("Tu email ya está verificado. La cooperativa tiene que <strong>activar tu cuenta</strong>; te vamos a avisar por mail.");
     }
+    if (perfil.estado !== "activa") return rechazar("Tu cuenta todavía no está activa.");
+    // Cada rol a su página
+    if (perfil.rol === "cliente") { location.replace("/clientes/"); return; }
+    if (perfil.rol === "empleado") { location.replace("/pedidos/"); return; }
     $("#usuario-nombre").textContent = perfil.usuario || [perfil.nombre, perfil.apellido].filter(Boolean).join(" ");
     $("#usuario-rol").textContent = ROLES[perfil.rol];
+    document.title = "Panel de administración | Lácteos NC";
     mostrar("panel");
     irA();
   };
@@ -725,7 +752,13 @@
         .then(r => { if (r.error) throw r.error; return r; });
       $("#i-clave").value = "";
       await entrar(data.session);
-    } catch (ex) { err.textContent = mensajeError(ex); err.hidden = false; }
+    } catch (ex) {
+      if (/Email not confirmed/i.test(ex?.message || "")) {
+        const em = encodeURIComponent($("#i-email").value.trim());
+        err.innerHTML = `Todavía no verificaste tu email. <a href="/registro/?verificar=${em}">Ingresá el código que te enviamos</a>.`;
+      } else err.textContent = mensajeError(ex);
+      err.hidden = false;
+    }
     finally { btn.disabled = false; }
   };
 

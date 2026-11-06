@@ -197,3 +197,38 @@ Cada plan nuevo se agrega al final con la misma estructura.
 6. Supabase → Authentication → URL Configuration: Site URL `https://lacteosnc.com.ar` y dirección de retorno `https://lacteosnc.com.ar/admin/` (para el mail de recuperar contraseña).
 
 **Archivos:** `supabase/migrations/20261106_09_limpieza_y_tarjetas.sql`, `admin/*`, `img/sin-foto.jpg`, `js/main.js`, `robots.txt`, `_headers`, `index.html`, `404.html`.
+
+---
+
+## Plan 10 — Botón Login y Fase 5: registro de clientes, área de clientes y pedidos
+
+**Fecha:** 06/11/2026 · **Estado:** hecho en código; falta configurar el envío de mails y "no soy un robot" (ver `PENDIENTES.md`)
+
+**Objetivo:** que los clientes se registren solos, vean su lista de precios y hagan pedidos, y que el personal arme y entregue esos pedidos.
+
+**Pasos:**
+1. **Botón Login** en el menú del sitio (contorno rojo con ícono), lleva a `https://lacteosnc.com.ar/admin/`. Esa página pasó a ser el **ingreso único**, que envía a cada uno a su lugar:
+   - cliente → `/clientes/`;
+   - empleado → `/pedidos/`;
+   - administrador y superadministrador → panel (con acceso a Pedidos);
+   - cuenta sin verificar → enlace para ingresar el código;
+   - pendiente de activación o bloqueada → mensaje y no entra.
+2. **Migración 10:** tabla `verificaciones` y funciones `verif_estado`, `verif_guardar` y `verif_comprobar`. El código se guarda cifrado (SHA-256 con sal). Solo el servidor puede usarlas. Probado en la base: errores 1 a 5 → esperas de 1, 2, 3, 4 y 5 min; desde el 5.º pide "no soy un robot"; el 6.º cancela el registro y bloquea el email 1 hora; un código vencido (20 min) se rechaza; no se puede reenviar antes de 60 s.
+3. **Edge Function `cuentas`** (ver `supabase/README.md`): registra, verifica, reenvía, consulta el estado y manda el mail de cuenta activa. Mails con Resend y control "no soy un robot" con Cloudflare Turnstile. Revisa el dígito verificador del CUIT y que el CUIT y el email no estén repetidos.
+4. **`/registro/`:** paso 1 con Usuario (grisado, "lo asigna la cooperativa"), Nombre, Apellido, \*Contraseña (y repetirla), \*CUIT (se escribe con guiones solo), \*Email, \*acepto términos y \*no soy un robot; paso 2 con el código, cuenta regresiva del vencimiento y de la espera, reenvío de código; paso 3 "Tu email quedó verificado, la cooperativa va a activar tu cuenta".
+5. **`/terminos/`:** términos y condiciones en **borrador** (cuenta, activación, precios informativos, pedidos sujetos a stock, datos personales según Ley 25.326).
+6. **Panel → Cuentas:** al activar una cuenta pendiente se manda el mail "Tu cuenta está activa" con usuario y email.
+7. **`/clientes/`:**
+   - **Lista de precios:** solo los precios de la lista asignada (los que faltan dicen "A confirmar"), con buscador.
+   - **Pedido tipo carrito:** cantidad con − / + o escrita (acepta decimales), resumen con total estimado y observaciones. El carrito queda guardado en el navegador.
+   - **Revisar y confirmar:** muestra "Su pedido fue generado correctamente" con el **número de pedido** y el detalle (código, descripción, cantidad), con opción de imprimir.
+   - **Mis pedidos:** cada pedido con su estado (en espera / armando pedido / pedido retirado) y su detalle.
+8. **`/pedidos/`** (empleados y administradores):
+   - Pestañas En espera / Armando / Retirados / Todos, con contadores; los activos se ven del más viejo al más nuevo.
+   - Buscador por número, cliente o CUIT; se actualiza cada 30 s.
+   - Al abrir un pedido en espera pasa solo a **armando pedido**. Muestra cliente, CUIT, observaciones y renglones.
+   - Botones **Marcar como retirado** e **Imprimir**.
+9. `robots.txt` y `_headers`: `/clientes/` y `/pedidos/` fuera de los buscadores. Versión `?v=6`.
+10. Prueba en navegador con datos simulados: registro con error de código y espera, compra con dos artículos (uno sin precio), confirmación con número, apertura y retiro de un pedido. Sin errores.
+
+**Archivos:** `index.html`, `css/styles.css`, `js/config.js`, `js/cuenta.js`, `admin/*`, `registro/*`, `terminos/index.html`, `clientes/*`, `pedidos/*`, `supabase/migrations/20261106_10_registro_codigos.sql`, `supabase/functions/cuentas/index.ts`, `robots.txt`, `_headers`.

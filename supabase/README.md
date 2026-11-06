@@ -17,6 +17,7 @@ las que ya se aplicaron.
 | `20261106_07_articulos.sql` | Tabla de artículos con los 59 códigos reales; precios y pedidos pasan a ser por artículo |
 | `20261106_08_precios_solo_activos.sql` | El cliente ve solo precios de artículos activos |
 | `20261106_09_limpieza_y_tarjetas.sql` | Borra 11 artículos internos, categoría Blandos y 13 tarjetas nuevas ocultas |
+| `20261106_10_registro_codigos.sql` | Tabla `verificaciones` y funciones del código de 6 dígitos (solo las usa la Edge Function) |
 
 ## Tablas
 
@@ -32,6 +33,7 @@ las que ya se aplicaron.
 | `pedidos` | Número (desde 1001), cliente, lista, estado, observaciones, total, quién lo abrió y retiró |
 | `pedido_items` | Renglones: artículo, código, descripción, cantidad, precio unitario y subtotal (copiados al crear el pedido) |
 | `mensajes_contacto` | Mensajes del formulario de contacto |
+| `verificaciones` | Código de verificación de cada registro pendiente (guardado cifrado), errores, esperas y bloqueos. Nadie la ve salvo el servidor |
 
 ## Roles y permisos
 
@@ -88,3 +90,19 @@ update public.perfiles
 ```
 
 Cuando el panel esté listo, el superadministrador podrá hacerlo desde ahí.
+
+## Función del servidor (Edge Function) `cuentas`
+
+Código en `supabase/functions/cuentas/index.ts`, publicada en
+`https://clztzhkjjulnmdaiobgl.supabase.co/functions/v1/cuentas` (sin exigir sesión: cada acción controla sus permisos).
+
+| Acción | Qué hace |
+|---|---|
+| `registrar` | Controla "no soy un robot", CUIT válido y términos; crea la cuenta sin verificar y manda el código por mail |
+| `verificar` | Comprueba el código: esperas de 1 a 5 minutos, "no soy un robot" desde el 5.º error, al 6.º borra el registro y bloquea el email 1 hora |
+| `reenviar` | Manda un código nuevo (con "no soy un robot", mínimo 60 s entre envíos, no reinicia los errores) |
+| `estado` | Devuelve si hay un código pendiente y cuánto falta de espera |
+| `avisar_activacion` | Solo administradores: manda al cliente el mail de "cuenta activa" con su usuario y email |
+
+**Secretos** (Supabase → Edge Functions → Secrets): `RESEND_API_KEY`, `MAIL_REMITENTE`, `TURNSTILE_SECRET` y, opcional, `MAIL_AVISOS`.
+Sin ellos la función responde "todavía no está configurado" y no crea cuentas.

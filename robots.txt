@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /clientes/
+Disallow: /pedidos/
 
 Sitemap: https://lacteosnc.com.ar/sitemap.xml

@@ -15,42 +15,26 @@ Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
 
 - [ ] **Fer y Macarena:** entrar a `https://lacteosnc.com.ar/admin/` con su email y contraseña y probar cada sección.
 
-## Fase 5 — Clientes y pedidos
+## Fase 5 — Lo que falta para que el registro funcione
 
-### Registro de clientes
-- [ ] Botón **Ingresar** en el menú.
-- [ ] Formulario de registro: Usuario (grisado, no editable por el cliente), Nombre, Apellido, \*Contraseña, \*CUIT, \*Email, \*aceptar términos y condiciones, \*"no soy un robot" (Cloudflare Turnstile). Los marcados con \* son obligatorios.
-- [ ] Al aceptar: se envía un **código de 6 dígitos** por mail, que **caduca a los 20 minutos**.
-- [ ] Esperas por código mal ingresado:
-  | Intento erróneo | Consecuencia |
-  |---|---|
-  | 1.º | esperar 1 min |
-  | 2.º | esperar 2 min |
-  | 3.º | esperar 3 min |
-  | 4.º | esperar 4 min |
-  | 5.º | esperar 5 min y volver a tildar "no soy un robot" |
-  | 6.º | el código caduca y se bloquea 1 hora; luego debe volver a registrarse y pedir un código nuevo |
-- [ ] Con el mail verificado, la cuenta queda **pendiente de activación**.
-- [ ] El administrador completa el campo **Usuario**, asigna la **lista de precio** y acepta: la cuenta queda activa.
-- [ ] Se envía un mail al cliente con su usuario y email, avisando que la cuenta está activa y lista para usar.
-- [ ] Redactar los términos y condiciones.
+El código ya está publicado. Falta conectar dos servicios:
 
-### Área de clientes
-- [ ] Ver la lista de precios que tiene asignada (solo esa).
-- [ ] Armar un pedido tipo carrito (sin pago): código de producto, descripción, cantidad.
-- [ ] Al confirmar: mensaje "Su pedido fue generado correctamente" con el **número de pedido** y el detalle.
-- [ ] Ver sus pedidos y su estado: **en espera**, **armando pedido**, **pedido retirado**.
-
-### Página "Pedidos" (rol empleado)
-- [ ] Solo la ven usuarios con permiso (rol empleado o administrador).
-- [ ] Lista de todos los pedidos; al abrir uno se ve qué pidió el cliente.
-- [ ] Al abrir un pedido "en espera", pasa automáticamente a **armando pedido**.
-- [ ] Marcar el pedido como **pedido retirado**.
+- [ ] **Fer:** crear una cuenta gratis en **Resend** (resend.com) con sistemas.emancipacion@gmail.com, agregar el dominio `lacteosnc.com.ar` y aceptar que configure los registros DNS en Cloudflare (o pedirle a Claude que los cargue). Crear una **API key**.
+- [ ] **Fer:** en Cloudflare → **Turnstile** → *Add widget*: nombre "Lácteos NC", dominio `lacteosnc.com.ar`, modo *Managed*. Copiar la **Site Key** (pública) y pasársela a Claude para `js/config.js`.
+- [ ] **Fer:** en Supabase → Edge Functions → **Secrets**, cargar (las claves secretas no se pasan por el chat):
+  - `RESEND_API_KEY` = la API key de Resend;
+  - `MAIL_REMITENTE` = `Lácteos NC <no-responder@lacteosnc.com.ar>`;
+  - `TURNSTILE_SECRET` = la Secret Key de Turnstile;
+  - `MAIL_AVISOS` (opcional) = mail que recibe el aviso de cada cliente nuevo para activar.
+- [ ] **Claude (con permiso):** en Supabase → Authentication → Sign In / Providers, desactivar "Allow new users to sign up", para que nadie pueda registrarse salteando el código y el "no soy un robot" (las cuentas se siguen creando desde la web y desde el panel de Supabase).
+- [ ] **Claude:** cuando esté todo configurado, probar un registro real de punta a punta.
+- [ ] **Cooperativa:** revisar y aprobar el texto de los **términos y condiciones** (`/terminos/`, hoy en borrador).
+- [ ] **Opcional:** cargar cuentas de **empleados** (se registran como clientes y el administrador les pone el rol Empleado al activarlas).
 
 ## Fase 6 — Contacto y mails
 
 - [ ] Formulario de contacto que guarde los mensajes en la base y avise por mail.
-- [ ] Servicio de envío de mails (Resend, plan gratuito) para códigos, avisos de cuenta activa y contacto.
+- [ ] Usar Resend (ya preparado para registro y activación) también para avisar los mensajes de contacto.
 - [ ] **En revisión:** definir el mail de contacto definitivo (por ahora `info@laemancipacion.com.ar`; opción `info@lacteosnc.com.ar` con Cloudflare Email Routing).
 
 ## Contenido y fotos

@@ -5,5 +5,8 @@
    ===================================================================== */
 window.NC_CONFIG = {
   supabaseUrl: "https://clztzhkjjulnmdaiobgl.supabase.co",
-  supabaseKey: "sb_publishable_je9wdPGOtnUodse0fAR7aA_cYV-TvCX"
+  supabaseKey: "sb_publishable_je9wdPGOtnUodse0fAR7aA_cYV-TvCX",
+  // Clave PÚBLICA del widget de Cloudflare Turnstile ("no soy un robot").
+  // La clave secreta va solo en Supabase → Edge Functions → Secrets (TURNSTILE_SECRET).
+  turnstileSiteKey: ""
 };

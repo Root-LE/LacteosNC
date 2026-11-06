@@ -121,3 +121,66 @@ tr.cambiado td { background: #FFFBEA; }
   .menu a { white-space: nowrap; font-size: 1rem; }
   .fila2 { grid-template-columns: 1fr; }
 }
+
+/* =====================================================================
+   Páginas con cuenta: registro, área de clientes y pedidos
+   ===================================================================== */
+.chip--azul { background: #E1E5FA; color: var(--azul); }
+.ventana--ancha { width: min(100% - 1.5rem, 900px); }
+.ingreso__caja--ancha { width: min(100%, 520px); }
+.ingreso__pie { text-align: center; margin: 1.2rem 0 0; color: var(--gris); }
+.ingreso__pie a { color: var(--rojo); font-weight: 700; }
+.ingreso .ok { color: var(--verde); background: #DDF3E6; border: 1px solid #B6E2C6; padding: .55rem .8rem; border-radius: 8px; margin: .8rem 0 0; }
+.obligatorio::after { content: " *"; color: var(--rojo); }
+input:disabled { background: var(--leche); color: var(--gris); cursor: not-allowed; }
+.codigo { font: 700 2rem/1 var(--f-titulo); letter-spacing: .55em; text-align: center; padding: .6rem .3rem .6rem .85rem; }
+.cuenta-atras { text-align: center; color: var(--gris); font-size: .9rem; margin: .6rem 0 0; }
+.cuenta-atras strong { color: var(--tinta); font-variant-numeric: tabular-nums; }
+.robot { margin-top: 1rem; min-height: 65px; }
+.pasos { display: flex; justify-content: center; gap: .5rem; margin: 0 0 1rem; padding: 0; list-style: none; font: 600 .9rem var(--f-titulo); text-transform: uppercase; color: var(--gris); }
+.pasos li { padding: .25rem .7rem; border-radius: 999px; background: var(--leche); }
+.pasos li[aria-current="step"] { background: var(--rojo); color: var(--blanco); }
+
+/* Estructura sin menú lateral */
+.cuenta { min-height: 100svh; display: flex; flex-direction: column; }
+.cuenta .barra { grid-column: auto; }
+.pestanas { display: flex; gap: .3rem; background: var(--tinta); padding: .5rem 1rem 0; overflow-x: auto; }
+.pestanas a { color: #E9E4E5; text-decoration: none; font: 600 1.1rem var(--f-titulo); padding: .6rem 1rem; border-radius: 8px 8px 0 0; white-space: nowrap; }
+.pestanas a:hover { background: rgba(255,255,255,.08); }
+.pestanas a[aria-current="page"] { background: var(--leche); color: var(--tinta); }
+.pestanas .contador { display: inline-block; min-width: 1.4em; padding: 0 .35em; margin-left: .3rem; border-radius: 999px; background: var(--rojo); color: var(--blanco); font-size: .85rem; text-align: center; }
+.cuenta .contenido { width: min(100%, 1200px); margin: 0 auto; }
+
+/* Carrito */
+.compra { display: grid; grid-template-columns: 1fr 320px; gap: 1.2rem; align-items: start; }
+.resumen { position: sticky; top: 1rem; background: var(--blanco); border: 1px solid var(--linea); border-top: 5px solid var(--rojo); border-radius: 10px; padding: 1rem 1.1rem; }
+.resumen h2 { font-size: 1.5rem; text-transform: uppercase; margin-bottom: .5rem; }
+.resumen ul { list-style: none; margin: 0 0 .6rem; padding: 0; max-height: 40vh; overflow-y: auto; }
+.resumen li { display: flex; justify-content: space-between; gap: .5rem; padding: .35rem 0; border-bottom: 1px dashed var(--linea); font-size: .92rem; }
+.resumen .total { display: flex; justify-content: space-between; font: 700 1.25rem var(--f-titulo); margin: .6rem 0; }
+.resumen textarea { min-height: 70px; }
+.cant { display: inline-flex; align-items: center; gap: .25rem; }
+.cant input { width: 5.5rem; text-align: right; }
+.cant button { width: 2rem; height: 2rem; border: 1.5px solid var(--linea); background: var(--blanco); border-radius: 6px; font-weight: 700; cursor: pointer; }
+.cant button:hover { border-color: var(--tinta); }
+tr.en-carrito td { background: #FFF7F7; }
+.sin-precio { color: var(--gris); font-style: italic; }
+
+/* Pedido generado / detalle */
+.confirmado { text-align: center; padding: .5rem 0 1rem; }
+.confirmado .numero { font: 700 3rem/1 var(--f-titulo); color: var(--rojo); margin: .3rem 0; }
+.ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .4rem 1.2rem; margin-bottom: 1rem; }
+.ficha div { font-size: .95rem; } .ficha b { display: block; font-size: .8rem; color: var(--gris); text-transform: uppercase; }
+tr.clic { cursor: pointer; } tr.clic:hover td { background: #FAFBFC; }
+.nota { background: #FFF8E6; border: 1px solid #F3DFA8; border-radius: 8px; padding: .6rem .8rem; margin: 0 0 1rem; }
+
+@media (max-width: 960px) { .compra { grid-template-columns: 1fr; } .resumen { position: static; } }
+
+@media print {
+  body { background: #fff; }
+  .barra, .pestanas, .ventana__pie, .ventana__cerrar, .aviso, .no-imprimir { display: none !important; }
+  .cuenta { display: none !important; }
+  .ventana { position: static; width: 100%; max-height: none; border: 0; box-shadow: none; }
+  .ventana::backdrop { display: none; }
+  .ventana__form, .ventana__cuerpo { max-height: none; overflow: visible; }
+}

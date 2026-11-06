@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Panel de administración | Lácteos NC</title>
+<title>Ingresar | Lácteos NC</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="/img/favicon.png">
-<link rel="stylesheet" href="admin.css?v=1">
+<link rel="stylesheet" href="admin.css?v=2">
 <script src="vendor/supabase-2.119.0.js"></script>
-<script src="/js/config.js?v=5"></script>
-<script src="admin.js?v=1" defer></script>
+<script src="/js/config.js?v=6"></script>
+<script src="admin.js?v=2" defer></script>
 </head>
 <body>
 
@@ -17,8 +17,8 @@
 <main class="ingreso" id="vista-ingreso" hidden>
   <form class="ingreso__caja" id="form-ingreso" novalidate>
     <img src="/img/logo-nc.png" alt="Lácteos NC" width="96" height="96">
-    <h1>Panel de administración</h1>
-    <p class="ingreso__ayuda">Ingresá con tu email y contraseña.</p>
+    <h1>Ingresar</h1>
+    <p class="ingreso__ayuda">Clientes y personal de la cooperativa: ingresá con tu email y contraseña.</p>
 
     <label for="i-email">Email</label>
     <input id="i-email" type="email" autocomplete="username" required>
@@ -29,6 +29,8 @@
     <p class="error" id="ingreso-error" role="alert" hidden></p>
     <button class="btn btn--rojo btn--ancho" type="submit">Ingresar</button>
     <button class="enlace" type="button" id="btn-olvide">Olvidé mi contraseña</button>
+    <p class="ingreso__pie">¿Sos cliente y todavía no tenés cuenta? <a href="/registro/">Registrate</a></p>
+    <p class="ingreso__pie"><a href="/" style="color:var(--gris);font-weight:600">← Volver al sitio</a></p>
   </form>
 
   <form class="ingreso__caja" id="form-nueva-clave" hidden novalidate>
@@ -65,6 +67,7 @@
     <a href="#listas">Listas de precio</a>
     <a href="#precios">Precios</a>
     <a href="#cuentas">Cuentas</a>
+    <a href="/pedidos/">Pedidos ↗</a>
   </nav>
 
   <main class="contenido" id="contenido" tabindex="-1"></main>

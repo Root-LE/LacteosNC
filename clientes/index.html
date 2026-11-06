@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mi cuenta | Lácteos NC</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="stylesheet" href="/admin/admin.css?v=2">
+<script src="/admin/vendor/supabase-2.119.0.js"></script>
+<script src="/js/config.js?v=6"></script>
+<script src="/js/cuenta.js?v=1"></script>
+<script src="clientes.js?v=1" defer></script>
+</head>
+<body>
+<div class="cuenta">
+  <header class="barra">
+    <a class="barra__marca" href="/" title="Ver el sitio">
+      <img src="/img/logo-nc.png" alt="" width="40" height="40"><span>Lácteos NC</span>
+    </a>
+    <div class="barra__usuario">
+      <span id="usuario-nombre"></span>
+      <span class="chip chip--gris" id="usuario-lista"></span>
+      <button class="btn btn--linea btn--chico" type="button" id="btn-mi-clave">Cambiar mi contraseña</button>
+      <button class="btn btn--linea btn--chico" type="button" id="btn-salir">Cerrar sesión</button>
+    </div>
+  </header>
+  <nav class="pestanas" aria-label="Secciones">
+    <a href="#pedir">Lista de precios y pedido <span class="contador" id="contador-carrito" hidden></span></a>
+    <a href="#mis-pedidos">Mis pedidos</a>
+  </nav>
+  <main class="contenido" id="contenido" tabindex="-1"><p class="vacio">Cargando…</p></main>
+</div>
+
+<dialog class="ventana" id="ventana">
+  <form method="dialog" class="ventana__form" novalidate>
+    <header class="ventana__cabecera"><h2 id="ventana-titulo"></h2>
+      <button type="button" class="ventana__cerrar" id="ventana-cerrar" aria-label="Cerrar">&times;</button></header>
+    <div class="ventana__cuerpo" id="ventana-cuerpo"></div>
+    <p class="error" id="ventana-error" role="alert" hidden></p>
+    <footer class="ventana__pie" id="ventana-pie"></footer>
+  </form>
+</dialog>
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+<noscript><p class="error">Esta página necesita JavaScript activado.</p></noscript>
+</body>
+</html>

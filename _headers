@@ -25,3 +25,11 @@
 /admin/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
+
+/clientes/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/pedidos/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store

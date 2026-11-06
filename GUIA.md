@@ -12,7 +12,7 @@ Leer antes de empezar cualquier tarea.
    - sacarla de `PENDIENTES.md` (o marcarla como hecha),
    - agregar en `PLANES.md` el plan implementado con sus pasos.
 5. **No tener abiertos en un editor** (VS Code, Notepad++, etc.) los archivos que se están modificando por otro lado: al guardar, el editor pisa los cambios nuevos con la versión vieja. Ya pasó una vez con `index.html`.
-6. **Al cambiar `css/styles.css` o `js/main.js`**, subir el número de versión en los enlaces de `index.html` y `404.html` (`?v=4` → `?v=5`). Si no, los visitantes siguen viendo la versión vieja guardada en su navegador.
+6. **Al cambiar `css/styles.css` o `js/main.js`**, subir el número de versión en los enlaces de `index.html` y `404.html` (ej. `?v=6` → `?v=7`). Si no, los visitantes siguen viendo la versión vieja guardada en su navegador.
 7. **Probar en el navegador con Ctrl + F5** (recarga sin caché) después de cada cambio.
 8. **Nunca subir contraseñas ni claves secretas** al repositorio. La clave pública (anon/publishable) de Supabase sí puede ir en el código; la `service_role` jamás.
 9. Hacer los cambios de base de datos en Supabase siempre con **migraciones** (archivos SQL con nombre y fecha), nunca a mano sin dejar registro.
@@ -33,7 +33,9 @@ Leer antes de empezar cualquier tarea.
 | Teléfono casa central | (02924) 420303 |
 | Compras (planta) | (02923) 436876 · info@laemancipacion.com.ar |
 | Administración (planta) | (02924) 401142 · administracionqueseria@laemancipacion.com.ar |
-| Panel de administración | https://lacteosnc.com.ar/admin/ (solo administradores y superadministradores) |
+| Login (ingreso único) | https://lacteosnc.com.ar/admin/ — clientes van a `/clientes/`, empleados a `/pedidos/`, administradores al panel |
+| Registro de clientes | https://lacteosnc.com.ar/registro/ |
+| Mails | Resend (pendiente de configurar). Remitente previsto: `no-responder@lacteosnc.com.ar` |
 | Usuarios internos | Fnardi (superadmin), Mfernandez (administrador). Regla: inicial del nombre + apellido |
 
 ## 3. Estructura del sitio
@@ -44,7 +46,12 @@ index.html      Página principal: Inicio, Institucional, Productos, Novedades, 
 css/styles.css  Estilos (colores, menú peluche/clásico, animación de leche)
 js/config.js    URL y clave PÚBLICA de Supabase
 js/main.js      Menú, catálogo y novedades (desde Supabase, con lista de respaldo), animación y formulario
-admin/          Panel de administración (productos, artículos, novedades, listas, precios, cuentas)
+admin/          Login único y panel de administración (productos, artículos, novedades, listas, precios, cuentas)
+registro/       Registro de clientes con código de 6 dígitos
+clientes/       Área de clientes: lista de precios, pedido tipo carrito, mis pedidos
+pedidos/        Página Pedidos para empleados y administradores
+terminos/       Términos y condiciones
+js/cuenta.js    Funciones compartidas por registro, clientes y pedidos
 supabase/       Migraciones SQL y documentación de la base (supabase/README.md)
 img/            Logos, fotos de productos (grande y -sm) y capas de leche (.webp)
 fonts/          Barlow, Barlow Condensed y Yellowtail, alojadas en el sitio

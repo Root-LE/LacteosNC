@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro de clientes | Lácteos NC</title>
+<meta name="description" content="Registrate como cliente de Lácteos NC para ver tu lista de precios y hacer pedidos.">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="stylesheet" href="/admin/admin.css?v=2">
+<script src="/admin/vendor/supabase-2.119.0.js"></script>
+<script src="/js/config.js?v=6"></script>
+<script src="/js/cuenta.js?v=1"></script>
+<script src="registro.js?v=1" defer></script>
+</head>
+<body>
+<main class="ingreso">
+  <div class="ingreso__caja ingreso__caja--ancha">
+    <a href="/" title="Volver al sitio"><img src="/img/logo-nc.png" alt="Lácteos NC" width="96" height="96"></a>
+    <h1>Registro de clientes</h1>
+    <ol class="pasos" aria-label="Pasos del registro">
+      <li id="paso-1" aria-current="step">1 · Tus datos</li>
+      <li id="paso-2">2 · Código</li>
+      <li id="paso-3">3 · Listo</li>
+    </ol>
+
+    <!-- Paso 1: datos -->
+    <form id="form-datos" novalidate>
+      <label for="r-usuario">Usuario</label>
+      <input id="r-usuario" disabled placeholder="Lo asigna la cooperativa al activar tu cuenta">
+
+      <div class="fila2">
+        <div><label for="r-nombre">Nombre</label><input id="r-nombre" autocomplete="given-name" maxlength="80"></div>
+        <div><label for="r-apellido">Apellido</label><input id="r-apellido" autocomplete="family-name" maxlength="80"></div>
+      </div>
+
+      <label for="r-clave" class="obligatorio">Contraseña</label>
+      <input id="r-clave" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+      <p class="ayuda">Mínimo 8 caracteres.</p>
+      <label for="r-clave2" class="obligatorio">Repetí la contraseña</label>
+      <input id="r-clave2" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+
+      <label for="r-cuit" class="obligatorio">CUIT</label>
+      <input id="r-cuit" inputmode="numeric" autocomplete="off" placeholder="20-12345678-9" maxlength="13" required>
+
+      <label for="r-email" class="obligatorio">Email</label>
+      <input id="r-email" type="email" autocomplete="email" maxlength="254" required>
+
+      <label class="check"><input type="checkbox" id="r-acepto" required>
+        <span class="obligatorio">Acepto los <a href="/terminos/" target="_blank" rel="noopener">términos y condiciones</a></span></label>
+
+      <div class="robot" id="robot-1"></div>
+
+      <p class="error" id="datos-error" role="alert" hidden></p>
+      <button class="btn btn--rojo btn--ancho" type="submit">Registrarme</button>
+      <p class="ayuda">Los campos con <span style="color:var(--rojo)">*</span> son obligatorios.</p>
+    </form>
+
+    <!-- Paso 2: código -->
+    <form id="form-codigo" hidden novalidate>
+      <p class="ingreso__ayuda">Te enviamos un código de 6 números a <strong id="c-email"></strong>.<br>Revisá también la carpeta de spam.</p>
+      <label for="c-codigo">Código</label>
+      <input id="c-codigo" class="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required>
+      <p class="cuenta-atras" id="c-vence" aria-live="polite"></p>
+      <div class="robot" id="robot-2" hidden></div>
+      <p class="error" id="codigo-error" role="alert" hidden></p>
+      <p class="ok" id="codigo-ok" role="status" hidden></p>
+      <button class="btn btn--rojo btn--ancho" type="submit" id="c-enviar">Verificar</button>
+      <p class="cuenta-atras" id="c-espera" aria-live="polite" hidden></p>
+      <button class="enlace" type="button" id="c-reenviar">No me llegó: enviar otro código</button>
+      <button class="enlace" type="button" id="c-volver">Corregir mis datos</button>
+    </form>
+
+    <!-- Paso 3: listo -->
+    <div id="listo" hidden>
+      <p class="ok">¡Tu email quedó verificado!</p>
+      <p>La cooperativa va a revisar tus datos, asignarte un <strong>usuario</strong> y tu <strong>lista de precios</strong>. Cuando la cuenta esté activa te avisamos por mail y vas a poder ingresar desde <strong>Login</strong> con tu email y contraseña.</p>
+      <a class="btn btn--linea btn--ancho" href="/">Volver al sitio</a>
+    </div>
+
+    <p class="ingreso__pie">¿Ya tenés cuenta? <a href="/admin/">Ingresá</a></p>
+  </div>
+</main>
+<noscript><p class="error">El registro necesita JavaScript activado.</p></noscript>
+</body>
+</html>

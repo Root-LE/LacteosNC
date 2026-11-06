@@ -107,6 +107,9 @@ p { margin: 0 0 1em; }
 }
 .nav a:hover, .nav a:focus-visible, .nav a[aria-current="true"] { color: var(--blanco); }
 .nav .nav__cta { background: var(--rojo); color: var(--blanco); border-radius: 999px; margin-left: .4rem; }
+/* Botón Login: contorno rojo, se llena al pasar el mouse */
+.nav .nav__login { display: inline-flex; align-items: center; gap: .4rem; color: var(--rojo); border: 2px solid var(--rojo); border-radius: 999px; padding: .55rem 1rem; margin-left: .2rem; }
+.nav .nav__login:hover, .nav .nav__login:focus-visible { color: var(--blanco); }
 
 /* ---- Estilo PELUCHE (predeterminado: <nav class="nav nav--peluche">) ----
    Detrás del texto aparece una "alfombra" roja de bordes peludos:
@@ -453,6 +456,7 @@ p { margin: 0 0 1em; }
   .nav ul { flex-direction: column; align-items: stretch; gap: 0; padding: .5rem 1.25rem 1.25rem; }
   .nav a { padding: .95rem 1rem; font-size: 1.4rem; }
   .nav .nav__cta { text-align: center; margin: .8rem 0 0; }
+  .nav .nav__login { justify-content: center; margin: .6rem 0 0; }
   .nav--peluche a::before { inset: .15rem 0; }
 
   .novedades__grilla { grid-template-columns: 1fr; }
