@@ -5,11 +5,6 @@
 Al completar algo: borrarlo de acá y anotarlo en `PLANES.md`.
 Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
 
-## Fase 2 — Publicar el sitio (en curso)
-
-- [ ] **Claude:** cuando Cloudflare marque `lacteosnc.com.ar` como **Active** (esperando la propagación de la delegación de nic.ar, hecha el 05/11/2026), conectar `lacteosnc.com.ar` y `www.lacteosnc.com.ar` en Pages → lacteosnc → Custom domains.
-- [ ] **Claude:** verificar que el sitio abra con candado (HTTPS) en ambas direcciones y que `www` redirija a la principal.
-
 ## Fase 3 — Pendientes que quedaron de la base de datos
 
 - [ ] **Fer:** pasar los **códigos reales** de los 11 productos (hoy tienen códigos provisorios NC-001 a NC-011).

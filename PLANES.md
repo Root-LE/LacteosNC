@@ -99,7 +99,7 @@ Cada plan nuevo se agrega al final con la misma estructura.
 
 ## Plan 6 — Fase 2: publicación en GitHub y Cloudflare Pages
 
-**Fecha:** 05/11/2026 · **Estado:** casi completo (falta conectar el dominio, ver `PENDIENTES.md`)
+**Fecha:** 05/11/2026 y 06/11/2026 · **Estado:** hecho
 
 **Pasos hechos:**
 1. Desde el Chrome del usuario se agregó `lacteosnc.com.ar` a Cloudflare con el plan Free. No había registros DNS previos.
@@ -114,7 +114,13 @@ Cada plan nuevo se agrega al final con la misma estructura.
 
 **Cómo se publica de ahora en más:** cada cambio que se sube a la rama `main` del repositorio se publica solo en Cloudflare Pages en uno o dos minutos.
 
-**Pasos que faltan:** conectar `lacteosnc.com.ar` y `www.lacteosnc.com.ar` cuando el dominio quede activo.
+**Conexión del dominio (06/11/2026):**
+10. Cloudflare marcó la zona `lacteosnc.com.ar` como activa ("Your domain is now protected by Cloudflare").
+11. En Pages → lacteosnc → Custom domains se agregaron `lacteosnc.com.ar` y `www.lacteosnc.com.ar`. Cloudflare creó solo los dos registros CNAME hacia `lacteosnc.pages.dev` y los certificados HTTPS. Estado de ambos: **Active**.
+12. Regla de redirección (Rules → Redirect Rules): `https://www.*` → `https://${1}`, código 301 permanente, conservando los parámetros. Así `www.lacteosnc.com.ar` lleva siempre a `lacteosnc.com.ar`.
+13. Se probó el sitio en `https://lacteosnc.com.ar` y en `https://www.lacteosnc.com.ar` (11 productos cargados desde la base). Durante los primeros minutos después de activar hubo cortes intermitentes mientras Cloudflare terminaba de distribuir los certificados.
+
+**Direcciones:** sitio oficial **https://lacteosnc.com.ar** · prueba **https://lacteosnc.pages.dev**.
 
 ---
 

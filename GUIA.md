@@ -25,6 +25,7 @@ Leer antes de empezar cualquier tarea.
 | Repositorio | `github.com/Root-LE/LacteosNC` (privado) |
 | Dominio | `lacteosnc.com.ar` (registrado en nic.ar) |
 | DNS y hosting | Cloudflare, cuenta `sistemas.emancipacion@gmail.com`, plan Free; proyecto de Pages **lacteosnc** |
+| Sitio oficial | https://lacteosnc.com.ar (`www` redirige acá) |
 | Dirección de prueba | https://lacteosnc.pages.dev |
 | Servidores DNS de Cloudflare | `brynne.ns.cloudflare.com` y `kanye.ns.cloudflare.com` |
 | Base de datos, usuarios y archivos | Supabase, proyecto **LacteosNC** (`clztzhkjjulnmdaiobgl`), plan Free |
