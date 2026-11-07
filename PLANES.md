@@ -274,3 +274,16 @@ Cada plan nuevo se agrega al final con la misma estructura.
 5. Cómo conecta el bot: ver `supabase/README.md` → "Novedades para el bot".
 
 **Archivos:** `index.html`, `supabase/migrations/20261106_11_eventos.sql`, `admin/admin.js`, `admin/index.html`, `supabase/README.md`.
+
+---
+
+## Plan 13 — Indexación en Google (Search Console)
+
+**Fecha:** 06/11/2026 · **Estado:** hecho (Google tarda de unos días a un par de semanas en mostrar el sitio)
+
+**Pasos:**
+1. La propiedad de dominio `lacteosnc.com.ar` ya estaba verificada en Google Search Console (registro TXT `google-site-verification` en Cloudflare).
+2. **Inspección de URLs** de `https://lacteosnc.com.ar/`: figuraba "La URL no está en Google". Se tocó **Solicitar indexación** → "Se ha añadido la URL a una cola de rastreo prioritaria".
+3. `sitemap.xml` actualizado: se agregaron `/registro/` y `/terminos/` y se cambió la fecha. Las páginas privadas (`/admin/`, `/clientes/`, `/pedidos/`) siguen excluidas en `robots.txt`.
+4. **Sitemaps** → se envió `https://lacteosnc.com.ar/sitemap.xml`: "Se ha enviado el sitemap correctamente", 3 páginas descubiertas.
+5. Para revisar más adelante: Search Console → Páginas (qué está indexado) y Rendimiento (búsquedas y clics).
