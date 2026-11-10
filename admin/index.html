@@ -6,10 +6,10 @@
 <title>Ingresar | Lácteos NC</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="/img/favicon.png">
-<link rel="stylesheet" href="admin.css?v=2">
+<link rel="stylesheet" href="admin.css?v=3">
 <script src="vendor/supabase-2.119.0.js"></script>
 <script src="/js/config.js?v=7"></script>
-<script src="admin.js?v=3" defer></script>
+<script src="admin.js?v=4" defer></script>
 </head>
 <body>
 
@@ -17,17 +17,20 @@
 <main class="ingreso" id="vista-ingreso" hidden>
   <form class="ingreso__caja" id="form-ingreso" novalidate>
     <img src="/img/logo-nc.png" alt="Lácteos NC" width="96" height="96">
-    <h1>Ingresar</h1>
-    <p class="ingreso__ayuda">Clientes y personal de la cooperativa: ingresá con tu email y contraseña.</p>
+    <h1 id="ingreso-titulo">Ingresar</h1>
+    <p class="ingreso__ayuda" id="ingreso-ayuda">Clientes y personal de la cooperativa: ingresá con tu email y contraseña.</p>
 
     <label for="i-email">Email</label>
     <input id="i-email" type="email" autocomplete="username" required>
 
-    <label for="i-clave">Contraseña</label>
-    <input id="i-clave" type="password" autocomplete="current-password" required>
+    <div id="campo-clave">
+      <label for="i-clave">Contraseña</label>
+      <input id="i-clave" type="password" autocomplete="current-password" required>
+    </div>
 
     <p class="error" id="ingreso-error" role="alert" hidden></p>
-    <button class="btn btn--rojo btn--ancho" type="submit">Ingresar</button>
+    <p class="ok" id="ingreso-ok" role="status" hidden></p>
+    <button class="btn btn--rojo btn--ancho" type="submit" id="btn-ingresar">Ingresar</button>
     <button class="enlace" type="button" id="btn-olvide">Olvidé mi contraseña</button>
     <p class="ingreso__pie">¿Sos cliente y todavía no tenés cuenta? <a href="/registro/">Registrate</a></p>
     <p class="ingreso__pie"><a href="/" style="color:var(--gris);font-weight:600">← Volver al sitio</a></p>

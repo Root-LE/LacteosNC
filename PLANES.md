@@ -341,3 +341,28 @@ Cada plan nuevo se agrega al final con la misma estructura.
 5. Versión de `styles.css` subida a `?v=9`. Probado sin errores.
 
 **Archivos:** `index.html`, `404.html`, `css/styles.css`.
+
+---
+
+## Plan 17 — "Olvidé mi contraseña" con pantalla propia y mail de Lácteos NC
+
+**Fecha:** 10/11/2026 · **Estado:** hecho (falta que Fer pruebe el mail real)
+
+**Pedido de Fer:** al tocar "Olvidé mi contraseña" mostrar solo el Email y que el botón diga "Solicitar nueva contraseña". Además, que el mail no llegue como "Supabase Auth <noreply@mail.app.supabase.io>" en inglés, sino como Lácteos NC.
+
+**Pasos:**
+1. **Login (`/admin/`)** con dos modos en el mismo formulario:
+   - **Ingresar:** email + contraseña.
+   - **Recuperar contraseña:** solo email; el botón dice **Solicitar nueva contraseña** y aparece "← Volver a ingresar".
+2. El mail ya no lo manda Supabase. Lo manda la función del servidor `cuentas` (acción nueva `recuperar`) por **Resend**:
+   - remitente **Lácteos NC <no-responder@lacteosnc.com.ar>**, en español, con el mismo diseño rojo que los demás mails;
+   - asunto "Elegí una contraseña nueva — Lácteos NC";
+   - botón "Elegir contraseña nueva"; el enlace vence en 1 hora y sirve una sola vez.
+3. El enlace apunta a `https://lacteosnc.com.ar/admin/?recuperar=…` (ya no a una dirección de Supabase). La página lo valida, saca el código de la barra de direcciones y muestra "Elegí una contraseña nueva". Si venció o ya se usó, avisa y deja pedir otro.
+4. **Seguridad:**
+   - Siempre responde el mismo mensaje, exista o no la cuenta, para no revelar qué emails están registrados.
+   - **Migración 12** (`recuperaciones` + `recup_permitir`): como máximo 1 mail por minuto y 5 por hora por email.
+   - Solo se manda a cuentas activas o pendientes de activación.
+5. Probado en navegador: el campo contraseña se oculta, el botón cambia, se envía el pedido correcto, "Volver a ingresar" restaura el formulario y un enlace vencido muestra el aviso.
+
+**Archivos:** `admin/index.html`, `admin/admin.js`, `supabase/functions/cuentas/index.ts`, `supabase/migrations/20261110_12_recuperar_clave.sql`.

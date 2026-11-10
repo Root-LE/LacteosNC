@@ -19,6 +19,7 @@ las que ya se aplicaron.
 | `20261106_09_limpieza_y_tarjetas.sql` | Borra 11 artículos internos, categoría Blandos y 13 tarjetas nuevas ocultas |
 | `20261106_10_registro_codigos.sql` | Tabla `verificaciones` y funciones del código de 6 dígitos (solo las usa la Edge Function) |
 | `20261106_11_eventos.sql` | Tabla `eventos` (novedades para el bot), disparadores y función `marcar_eventos` |
+| `20261110_12_recuperar_clave.sql` | Tabla `recuperaciones` y `recup_permitir`: límite de mails de "Olvidé mi contraseña" (1 por minuto, 5 por hora) |
 
 ## Tablas
 
@@ -105,6 +106,7 @@ Código en `supabase/functions/cuentas/index.ts`, publicada en
 | `reenviar` | Manda un código nuevo (con "no soy un robot", mínimo 60 s entre envíos, no reinicia los errores) |
 | `estado` | Devuelve si hay un código pendiente y cuánto falta de espera |
 | `avisar_activacion` | Solo administradores: manda al cliente el mail de "cuenta activa" con su usuario y email |
+| `recuperar` | "Olvidé mi contraseña": manda el mail de Lácteos NC con un enlace a `/admin/?recuperar=…` (vence en 1 hora). Siempre responde lo mismo, exista o no la cuenta |
 
 **Secretos** (Supabase → Edge Functions → Secrets): `RESEND_API_KEY`, `MAIL_REMITENTE`, `TURNSTILE_SECRET` y, opcional, `MAIL_AVISOS`.
 Sin ellos la función responde "todavía no está configurado" y no crea cuentas.

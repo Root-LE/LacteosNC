@@ -782,33 +782,62 @@
     irA();
   };
 
+  // ---------- Ingreso y "Olvidé mi contraseña" (mismo formulario, dos modos) ----------
+  let modoRecuperar = false;
+  const modoIngreso = recuperar => {
+    modoRecuperar = recuperar;
+    $("#ingreso-titulo").textContent = recuperar ? "Recuperar contraseña" : "Ingresar";
+    $("#ingreso-ayuda").textContent = recuperar
+      ? "Escribí el email de tu cuenta y te enviamos un enlace para elegir una contraseña nueva."
+      : "Clientes y personal de la cooperativa: ingresá con tu email y contraseña.";
+    $("#campo-clave").hidden = recuperar;
+    $("#i-clave").required = !recuperar;
+    $("#btn-ingresar").textContent = recuperar ? "Solicitar nueva contraseña" : "Ingresar";
+    $("#btn-olvide").textContent = recuperar ? "← Volver a ingresar" : "Olvidé mi contraseña";
+    $("#ingreso-error").hidden = true;
+    $("#ingreso-ok").hidden = true;
+    $("#i-email").focus();
+  };
+  $("#btn-olvide").onclick = () => modoIngreso(!modoRecuperar);
+
+  // Pide el enlace de recuperación a la función del servidor (mail de Lácteos NC por Resend)
+  const pedirRecuperacion = async email => {
+    const r = await fetch(`${window.NC_CONFIG.supabaseUrl}/functions/v1/cuentas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: window.NC_CONFIG.supabaseKey },
+      body: JSON.stringify({ accion: "recuperar", email })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || "No se pudo enviar el mail. Probá de nuevo.");
+    return j;
+  };
+
   $("#form-ingreso").onsubmit = async e => {
     e.preventDefault();
-    const err = $("#ingreso-error");
-    const btn = e.target.querySelector('button[type="submit"]');
-    err.hidden = true; btn.disabled = true;
+    const err = $("#ingreso-error"), ok = $("#ingreso-ok");
+    const btn = $("#btn-ingresar");
+    const email = $("#i-email").value.trim();
+    err.hidden = true; ok.hidden = true;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "Escribí un email válido."; err.hidden = false; return; }
+    btn.disabled = true;
     try {
-      const { data } = await sb.auth.signInWithPassword({ email: $("#i-email").value.trim(), password: $("#i-clave").value })
+      if (modoRecuperar) {
+        const j = await pedirRecuperacion(email);
+        ok.textContent = j.mensaje || "Si el email está registrado, te llegará un enlace para elegir una contraseña nueva.";
+        ok.hidden = false;
+        return;
+      }
+      const { data } = await sb.auth.signInWithPassword({ email, password: $("#i-clave").value })
         .then(r => { if (r.error) throw r.error; return r; });
       $("#i-clave").value = "";
       await entrar(data.session);
     } catch (ex) {
-      if (/Email not confirmed/i.test(ex?.message || "")) {
-        const em = encodeURIComponent($("#i-email").value.trim());
-        err.innerHTML = `Todavía no verificaste tu email. <a href="/registro/?verificar=${em}">Ingresá el código que te enviamos</a>.`;
+      if (!modoRecuperar && /Email not confirmed/i.test(ex?.message || "")) {
+        err.innerHTML = `Todavía no verificaste tu email. <a href="/registro/?verificar=${encodeURIComponent(email)}">Ingresá el código que te enviamos</a>.`;
       } else err.textContent = mensajeError(ex);
       err.hidden = false;
     }
     finally { btn.disabled = false; }
-  };
-
-  $("#btn-olvide").onclick = async () => {
-    const email = $("#i-email").value.trim();
-    const err = $("#ingreso-error");
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "Escribí tu email arriba y tocá de nuevo \"Olvidé mi contraseña\"."; err.hidden = false; return; }
-    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/admin/` });
-    err.hidden = false;
-    err.textContent = error ? mensajeError(error) : "Si el email está registrado, te llegará un enlace para elegir una contraseña nueva.";
   };
 
   // Formulario de contraseña nueva (enlace de recuperación o "Cambiar mi contraseña")
@@ -844,8 +873,20 @@
   });
 
   (async () => {
+    const token = new URLSearchParams(location.search).get("recuperar");
+    if (token) {
+      history.replaceState(null, "", location.pathname); // saca el token de la barra de direcciones
+      const { error } = await sb.auth.verifyOtp({ token_hash: token, type: "recovery" });
+      if (!error) { pedirClaveNueva(); return; }
+      mostrar("ingreso");
+      modoIngreso(true);
+      const err = $("#ingreso-error");
+      err.textContent = "El enlace venció o ya se usó. Pedí uno nuevo con tu email.";
+      err.hidden = false;
+      return;
+    }
     const { data } = await sb.auth.getSession();
-    if (location.hash.includes("type=recovery")) return; // lo maneja PASSWORD_RECOVERY
+    if (location.hash.includes("type=recovery")) return; // enlaces viejos: lo maneja PASSWORD_RECOVERY
     if (data.session) entrar(data.session); else mostrar("ingreso");
   })();
 })();

@@ -8,6 +8,7 @@
 //   MAIL_REMITENTE    ej.: Lácteos NC <no-responder@lacteosnc.com.ar>
 //   TURNSTILE_SECRET  clave secreta de Cloudflare Turnstile ("no soy un robot")
 //   MAIL_AVISOS       (opcional) mail que recibe el aviso de clientes nuevos
+// Acciones: registrar, verificar, reenviar, estado, avisar_activacion, recuperar
 // =====================================================================
 import { createClient } from "npm:@supabase/supabase-js@2.119.0";
 
@@ -245,6 +246,34 @@ async function avisarActivacion(d: Record<string, unknown>, jwt: string | null) 
   return { ok: true };
 }
 
+// "Olvidé mi contraseña": genera el enlace y lo manda con el diseño de Lácteos NC.
+// Siempre responde lo mismo, exista o no la cuenta (no revela qué emails están registrados).
+async function recuperar(d: Record<string, unknown>) {
+  const email = String(d.email ?? "").trim().toLowerCase();
+  if (!EMAIL_RE.test(email)) throw new Falla(400, "Escribí un email válido.");
+  const respuesta = { ok: true, mensaje: "Si el email está registrado, te llegará un mail de Lácteos NC con un enlace para elegir una contraseña nueva. Revisá también la carpeta de spam." };
+
+  const { data: permitido } = await sb.rpc("recup_permitir", { p_email: email });
+  if (!permitido) return respuesta;
+
+  const { data: p } = await sb.from("perfiles").select("nombre, estado").eq("email", email).maybeSingle();
+  if (!p || !["activa", "pendiente_activacion"].includes(p.estado)) return respuesta;
+
+  const { data: link, error } = await sb.auth.admin.generateLink({ type: "recovery", email });
+  const token = link?.properties?.hashed_token;
+  if (error || !token) { console.error("generateLink", error); return respuesta; }
+
+  const enlace = `${SITIO}/admin/?recuperar=${encodeURIComponent(token)}`;
+  await mandarMail(email, "Elegí una contraseña nueva — Lácteos NC",
+    plantilla("Recuperá tu contraseña", `<p>Hola${p.nombre ? " " + esc(p.nombre) : ""}:</p>
+      <p>Recibimos un pedido para cambiar la contraseña de tu cuenta en Lácteos NC. Tocá el botón para elegir una nueva:</p>
+      <p style="margin:20px 0"><a href="${enlace}" style="display:inline-block;background:#E1141C;color:#fff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Elegir contraseña nueva</a></p>
+      <p style="font-size:13px;color:#666">Por seguridad el enlace vence en 1 hora y se puede usar una sola vez.</p>
+      <p style="font-size:13px;color:#666">Si no pediste este cambio, ignorá este mail: tu contraseña sigue siendo la misma.</p>`),
+    `Recibimos un pedido para cambiar la contraseña de tu cuenta en Lácteos NC. Elegí una nueva acá (vence en 1 hora): ${enlace} — Si no lo pediste, ignorá este mail.`);
+  return respuesta;
+}
+
 // ------------------------------------------------------------------ servidor
 Deno.serve(async (req) => {
   const h = cors(req.headers.get("Origin"));
@@ -263,6 +292,7 @@ Deno.serve(async (req) => {
       case "reenviar": return responder(200, await reenviar(d, ip));
       case "estado": return responder(200, await estado(d));
       case "avisar_activacion": return responder(200, await avisarActivacion(d, jwt));
+      case "recuperar": return responder(200, await recuperar(d));
       default: return responder(400, { error: "Acción desconocida" });
     }
   } catch (e) {
