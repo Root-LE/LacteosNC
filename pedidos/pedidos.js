@@ -207,7 +207,26 @@
     contenido.querySelectorAll("[data-cancelar]").forEach(btn => btn.onclick = () => cancelar(Number(btn.dataset.cancelar)));
   };
 
-  const detalle = p => `
+  // ---------- Armado: pesadas y bultos ----------
+  const kg = n => Number(n || 0).toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+  // "4,255" → 4.255 · "1.250,5" → 1250.5 · "4.255" (sin coma) → 4.255
+  const numero = t => {
+    t = String(t || "").trim().replace(/\s/g, "");
+    if (!t) return null;
+    if (t.includes(",")) t = t.replace(/\./g, "").replace(",", ".");
+    const n = Number(t);
+    return Number.isFinite(n) ? n : NaN;
+  };
+  const avance = i => {
+    const dif = Math.round((Number(i.cantidad_pesada || 0) - Number(i.cantidad)) * 100) / 100;
+    if (!Number(i.cantidad_pesada)) return '<span class="chip chip--gris">Sin pesar</span>';
+    if (dif === 0) return '<span class="chip chip--verde">Completo ✓</span>';
+    return dif < 0 ? `<span class="chip chip--ambar">Faltan ${esc(cantidad(-dif))}</span>`
+                   : `<span class="chip chip--rojo">Sobran ${esc(cantidad(dif))}</span>`;
+  };
+  const pendientes = p => p.items.filter(i => Math.round((Number(i.cantidad_pesada || 0) - Number(i.cantidad)) * 100) !== 0);
+
+  const fichaPedido = p => `
     <div class="ficha">
       <div><b>Estado</b>${chipPedido(p.estado)}</div>
       <div><b>Fecha del pedido</b>${esc(fecha(p.creado))}</div>
@@ -221,13 +240,95 @@
       ${p.cancelado ? `<div><b>Cancelado</b>${esc(fecha(p.cancelado))}</div>` : ""}
     </div>
     ${p.motivo_cancelacion ? `<p class="nota"><b>Motivo de cancelación:</b> ${esc(p.motivo_cancelacion)}</p>` : ""}
-    ${p.observaciones ? `<p class="nota"><b>Observaciones del cliente:</b> ${esc(p.observaciones)}</p>` : ""}
-    <div class="tabla-caja"><table>
+    ${p.observaciones ? `<p class="nota"><b>Observaciones del cliente:</b> ${esc(p.observaciones)}</p>` : ""}`;
+
+  // Tabla de renglones. En "armando" se puede pesar y poner bultos; en "retirado" se ve lo que se pesó.
+  const tablaItems = p => {
+    const armando = p.estado === "armando";
+    const huboArmado = armando || p.items.some(i => Number(i.cantidad_pesada) || i.bultos != null);
+    if (!huboArmado) return `<div class="tabla-caja"><table>
       <thead><tr><th>Código</th><th>Descripción</th><th class="num">Cantidad</th><th class="num">Precio</th><th class="num">Subtotal</th></tr></thead>
       <tbody>${p.items.map(i => `<tr><td><strong>${esc(i.codigo)}</strong></td><td>${esc(i.descripcion)}</td>
         <td class="num"><strong>${esc(cantidad(i.cantidad))}</strong></td><td class="num">${esc(plata(i.precio_unitario))}</td>
         <td class="num">${i.subtotal == null ? "—" : esc(plata(i.subtotal))}</td></tr>`).join("")}</tbody>
     </table></div>`;
+
+    const totKg = p.items.reduce((t, i) => t + Number(i.kilos || 0), 0);
+    const totBultos = p.items.reduce((t, i) => t + Number(i.bultos || 0), 0);
+    const falta = pendientes(p).length;
+    return `${armando ? `<p class="ayuda">Por cada renglón cargá las pesadas (<strong>Peso o Kilos</strong> y <strong>Cantidad pesada</strong>) hasta que la cantidad pesada sea igual a la pedida.</p>` : ""}
+    <div class="tabla-caja"><table class="armado">
+      <thead><tr><th>Código</th><th>Descripción</th><th class="num">Cantidad pedida</th><th class="num">Peso o Kilos</th><th class="num">Cantidad pesada</th><th class="num">Bultos</th></tr></thead>
+      <tbody>${p.items.map(i => `<tr class="armado__item">
+          <td><strong>${esc(i.codigo)}</strong></td><td>${esc(i.descripcion)}</td>
+          <td class="num"><strong>${esc(cantidad(i.cantidad))}</strong></td>
+          <td class="num">${esc(kg(i.kilos))} kg</td>
+          <td class="num">${esc(cantidad(i.cantidad_pesada || 0))}<br>${avance(i)}</td>
+          <td class="num">${armando
+            ? `<input class="armado__bultos" type="text" inputmode="numeric" data-item="${i.id}" value="${i.bultos ?? ""}" placeholder="—" aria-label="Bultos de ${esc(i.descripcion)}">`
+            : esc(i.bultos ?? "—")}</td></tr>
+        <tr class="armado__pesadas"><td colspan="6">
+          ${i.pesadas.length ? `<ol class="pesadas">${i.pesadas.map((w, n) => `<li>
+              <span class="pesadas__n">Pesada ${n + 1}</span> ${esc(kg(w.kilos))} kg · cantidad ${esc(cantidad(w.cantidad))}
+              ${armando ? `<button type="button" class="pesadas__quitar" data-quitar="${w.id}" title="Quitar la pesada ${n + 1}" aria-label="Quitar la pesada ${n + 1} de ${esc(i.descripcion)}">✕</button>` : ""}</li>`).join("")}</ol>`
+            : armando ? "" : '<span class="ayuda">Sin pesadas.</span>'}
+          ${armando ? `<div class="pesar" data-item="${i.id}">
+              <label>Peso o Kilos <input class="pesar__kilos" type="text" inputmode="decimal" placeholder="0,000" aria-label="Peso o kilos para ${esc(i.descripcion)}"></label>
+              <label>Cantidad pesada <input class="pesar__cant" type="text" inputmode="decimal" value="${(() => { const r = Math.round((Number(i.cantidad) - Number(i.cantidad_pesada || 0)) * 100) / 100; return r > 0 ? esc(cantidad(r)) : ""; })()}" aria-label="Cantidad pesada para ${esc(i.descripcion)}"></label>
+              <button type="button" class="btn btn--linea btn--chico pesar__agregar">+ Agregar pesada</button>
+            </div>` : ""}
+        </td></tr>`).join("")}</tbody>
+      <tfoot><tr><td colspan="3"><strong>Totales</strong>${armando ? ` · ${falta ? `${falta} renglón${falta === 1 ? "" : "es"} sin completar` : "todo pesado ✓"}` : ""}</td>
+        <td class="num"><strong>${esc(kg(totKg))} kg</strong></td><td></td><td class="num"><strong>${esc(cantidad(totBultos))}</strong></td></tr></tfoot>
+    </table></div>`;
+  };
+
+  const detalle = p => fichaPedido(p) + `<div id="items-pedido">${tablaItems(p)}</div>`;
+
+  // Conecta los controles de armado. Cada cambio se guarda en la base y se redibuja la tabla.
+  const conectarArmado = p => {
+    const caja = $("#items-pedido");
+    if (!caja || p.estado !== "armando") return;
+    const actualizar = (nuevo, foco) => {
+      Object.assign(p, nuevo);
+      caja.innerHTML = tablaItems(p);
+      conectarArmado(p);
+      if (foco) caja.querySelector(`.pesar[data-item="${foco}"] .pesar__kilos`)?.focus();
+    };
+    const llamar = async (fn, args, boton, foco) => {
+      if (boton) boton.disabled = true;
+      try {
+        const { data, error } = await sb.rpc(fn, args);
+        if (error) throw error;
+        actualizar(data, foco);
+        return true;
+      } catch (ex) { avisar(mensajeError(ex), true); if (boton) boton.disabled = false; return false; }
+    };
+    caja.querySelectorAll(".pesar").forEach(f => {
+      const kilos = f.querySelector(".pesar__kilos"), cant = f.querySelector(".pesar__cant"), btn = f.querySelector(".pesar__agregar");
+      const agregar = () => {
+        const k = numero(kilos.value), c = numero(cant.value);
+        kilos.classList.toggle("np-cant--mal", !(k > 0)); cant.classList.toggle("np-cant--mal", !(c > 0));
+        if (!(k > 0)) { kilos.focus(); return avisar("Escribí el peso en kilos (por ejemplo 4,255).", true); }
+        if (!(c > 0)) { cant.focus(); return avisar("Escribí la cantidad pesada.", true); }
+        llamar("agregar_pesada", { p_item: Number(f.dataset.item), p_kilos: k, p_cantidad: c }, btn, f.dataset.item);
+      };
+      btn.onclick = agregar;
+      [kilos, cant].forEach(inp => inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); agregar(); } });
+    });
+    caja.querySelectorAll("[data-quitar]").forEach(b => b.onclick = () => {
+      if (confirm("¿Quitar esta pesada?")) llamar("quitar_pesada", { p_pesada: Number(b.dataset.quitar) }, b);
+    });
+    caja.querySelectorAll(".armado__bultos").forEach(inp => {
+      inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); inp.blur(); } };
+      inp.onchange = () => {
+        const t = inp.value.trim();
+        const b = t === "" ? null : Number(t);
+        if (b !== null && !(Number.isInteger(b) && b >= 0)) { inp.classList.add("np-cant--mal"); return avisar("Los bultos van en número entero (0, 1, 2…).", true); }
+        llamar("guardar_bultos", { p_item: Number(inp.dataset.item), p_bultos: b }).then(ok => ok && avisar("Bultos guardados."));
+      };
+    });
+  };
 
   const abrir = async numero => {
     try {
@@ -244,7 +345,11 @@
       botones.push({ texto: "Aceptar pedido", clase: "btn--rojo", accion: async () => { await aceptar(p.numero); } });
     } else if (p.estado === "armando") {
       botones.push({ texto: "Marcar como retirado", clase: "btn--rojo", accion: async () => {
-        if (!confirm(`¿Confirmás que el cliente retiró el pedido N.º ${p.numero}?`)) return false;
+        const falta = pendientes(p);
+        const aviso = falta.length
+          ? `Hay ${falta.length} renglón${falta.length === 1 ? "" : "es"} donde la cantidad pesada no es igual a la pedida:\n${falta.map(i => "• " + i.descripcion).join("\n")}\n\n¿Marcar el pedido N.º ${p.numero} como retirado igual?`
+          : `¿Confirmás que el cliente retiró el pedido N.º ${p.numero}?`;
+        if (!confirm(aviso)) return false;
         const { error } = await sb.rpc("marcar_retirado", { p_numero: p.numero });
         if (error) throw error;
         avisar(`Pedido ${p.numero} retirado: pasó a Retirados.`);
@@ -253,6 +358,7 @@
     }
     botones.push({ texto: "Cerrar" });
     ventana({ titulo: `Pedido N.º ${p.numero}`, ancho: true, cuerpo: detalle(p), botones });
+    conectarArmado(p);
   };
 
   const refrescar = async () => {

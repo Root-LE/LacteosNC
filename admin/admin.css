@@ -237,3 +237,23 @@ a.kpi:hover { border-color: var(--tinta); }
 .np-cant { width: 6.5rem; text-align: right; padding: .3rem .5rem; }
 .np-cant--mal { border-color: var(--rojo) !important; background: #FDECEC; }
 .np-resumen { margin: .3rem 0 .8rem; }
+
+/* Datos del pedido: que un email largo no se encime con el dato de al lado */
+.ficha div { min-width: 0; overflow-wrap: anywhere; }
+
+/* Armado: pesadas y bultos */
+.armado td { vertical-align: top; }
+.armado__item td { border-bottom: 0; padding-bottom: .2rem; }
+.armado__pesadas td { padding-top: 0; background: #FAFBFC; }
+.armado tfoot td { border-top: 2px solid #E2E5EA; }
+.armado .chip { margin-top: .2rem; }
+.armado__bultos { width: 4.5rem; text-align: right; padding: .3rem .5rem; }
+.pesadas { list-style: none; margin: .3rem 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
+.pesadas li { display: inline-flex; align-items: center; gap: .35rem; background: #fff; border: 1px solid #E2E5EA; border-radius: 999px; padding: .15rem .3rem .15rem .7rem; font-size: .9rem; }
+.pesadas__n { font-weight: 700; color: var(--gris); }
+.pesadas__quitar { border: 0; background: none; color: var(--gris); cursor: pointer; width: 26px; height: 26px; border-radius: 50%; }
+.pesadas__quitar:hover { background: #FDECEC; color: var(--rojo); }
+.pesar { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem .8rem; margin: .4rem 0 .3rem; }
+.pesar label { display: flex; flex-direction: column; font-size: .8rem; font-weight: 700; gap: .2rem; margin: 0; }
+.pesar input { width: 8rem; text-align: right; padding: .35rem .5rem; }
+@media print { .pesar, .pesadas__quitar { display: none !important; } .armado__pesadas td { background: none; } }

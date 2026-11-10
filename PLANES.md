@@ -426,3 +426,32 @@ Cada plan nuevo se agrega al final con la misma estructura.
 5. **Corrección (migración 15):** al apuntar `cargado_por` a `perfiles` quedaron dos relaciones entre pedidos y perfiles y la solapa En espera mostraba "Could not embed because more than one relationship was found". Se cambió para que apunte a `auth.users`, como `aceptado_por` y las demás, y la página pide explícitamente la relación del cliente.
 
 **Archivos:** `supabase/migrations/20261110_14_pedido_para_cliente.sql`, `supabase/migrations/20261110_15_cargado_por_auth_users.sql`, `pedidos/pedidos.js`, `pedidos/index.html`, `admin/admin.css`, `clientes/clientes.js`, `supabase/README.md`.
+
+---
+
+## Plan 20 — Armado de pedidos: pesadas, kilos y bultos
+
+**Fecha:** 10/11/2026 · **Estado:** hecho (la fórmula de bultos queda para más adelante)
+
+**Pedido de Fer** (después de probar con el cliente `test`: Mfernandez aceptó el pedido y pasó bien a Armando):
+- en el detalle del pedido, el email del cliente se encimaba con "Total estimado";
+- agregar, solo en Armando y para que lo complete el empleado:
+  - **Peso o Kilos** de cada producto;
+  - **Cantidad pesada**: se van sumando pesadas hasta igualar la cantidad que pidió el cliente;
+  - **Bultos**: editable por ahora, después tendrá su fórmula.
+
+**Pasos:**
+1. **Datos del pedido:** los textos largos (como el email) cortan línea dentro de su lugar y ya no se enciman.
+2. **Migración 16:**
+   - tabla `pedido_pesadas` (renglón, kilos con 3 decimales, cantidad, quién y cuándo) y columna `bultos` en `pedido_items`;
+   - funciones `agregar_pesada`, `quitar_pesada` y `guardar_bultos`, para empleados y administradores, y solo con el pedido **en Armando** (retirado queda cerrado);
+   - `detalle_pedido` devuelve por renglón las pesadas, los kilos y la cantidad pesada totales y los bultos.
+3. **`/pedidos/`, pedido en Armando:**
+   - tabla con Cantidad pedida, **Peso o Kilos** (suma), **Cantidad pesada** (suma) con estado *Sin pesar*, *Faltan X*, *Completo ✓* o *Sobran X*, y **Bultos**;
+   - por renglón, las pesadas cargadas (se pueden quitar con ✕) y los campos para una nueva: la cantidad viene sugerida con lo que falta; Enter agrega;
+   - totales de kilos y bultos, y cuántos renglones faltan completar;
+   - al **Marcar como retirado**, si hay renglones sin completar avisa cuáles y pide confirmar.
+4. En **Retirados** se ve lo que se pesó (sin poder cambiarlo); al imprimir no salen los campos de carga.
+5. Probado en la base (transacción que se deshace) sobre el pedido 1001: dos pesadas suman bien, quitar descuenta, bultos se guardan, kilos 0 rechazado, el cliente no puede pesar ni leer la tabla, y en un pedido retirado no se puede pesar. En navegador con datos simulados: carga de pesadas, cantidad sugerida, bultos y aviso al retirar.
+
+**Archivos:** `supabase/migrations/20261110_16_pesadas_y_bultos.sql`, `pedidos/pedidos.js`, `pedidos/index.html`, `admin/admin.css`, `supabase/README.md`.

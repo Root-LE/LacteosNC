@@ -34,6 +34,7 @@ las que ya se aplicaron.
 | `novedades` | Título, descripción, datos, foto / YouTube / video, producto relacionado |
 | `pedidos` | Número (desde 1001), cliente, lista, estado, observaciones, total, quién lo cargó (si lo hizo un administrador por el cliente), aceptó, abrió, retiró o canceló (y el motivo) |
 | `pedido_items` | Renglones: artículo, código, descripción, cantidad, precio unitario y subtotal (copiados al crear el pedido) |
+| `pedido_pesadas` | Pesadas de cada renglón al armar: Peso o Kilos y Cantidad pesada (puede haber varias por renglón). Los bultos van en `pedido_items.bultos`. Se leen con `detalle_pedido` y se cargan con las funciones de armado |
 | `mensajes_contacto` | Mensajes del formulario de contacto |
 | `eventos` | Novedades automáticas para el bot: cliente para activar, cuenta activada o bloqueada, pedido nuevo, armando y retirado (con los datos completos en `datos`) |
 | `intentos_ingreso` | Errores al ingresar con **usuario**: 5 errores seguidos bloquean ese usuario 15 minutos. Nadie la ve salvo el servidor |
@@ -68,6 +69,8 @@ Usuario y email son **únicos** (sin distinguir mayúsculas): la base no deja re
 | `detalle_pedido(p_numero)` | Dueño o personal | Devuelve el pedido con cliente, renglones, fechas y motivo de cancelación (el empleado solo los aceptados). |
 | `abrir_pedido(p_numero)` | Empleado / admin | Devuelve el detalle (ya no cambia el estado; anota quién lo abrió primero). |
 | `crear_pedido_para(p_cliente, p_items, p_observaciones, p_aceptar)` | Administrador | Carga un pedido **a nombre de un cliente activo** (ej.: lo pasó por WhatsApp), con los precios de la lista de ese cliente. Con `p_aceptar` = true (por defecto) entra directo en *armando*; si no, queda *en espera*. El cliente lo ve en Mis pedidos. |
+| `agregar_pesada(p_item, p_kilos, p_cantidad)` / `quitar_pesada(p_pesada)` | Empleado / admin | Solo con el pedido en *armando*. Suma o quita una pesada del renglón. El renglón está completo cuando la cantidad pesada es igual a la pedida |
+| `guardar_bultos(p_item, p_bultos)` | Empleado / admin | Solo en *armando*. Bultos del renglón (entero; por ahora se carga a mano) |
 | `aceptar_pedido(p_numero)` | Administrador | Pasa de *en espera* a *armando*. |
 | `cancelar_pedido(p_numero, p_motivo)` | Administrador | Pasa de *en espera* a *cancelado*, con motivo opcional (hasta 300 caracteres). |
 | `marcar_retirado(p_numero)` | Empleado / admin | Pasa de *armando* a *retirado*. |

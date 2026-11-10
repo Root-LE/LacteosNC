@@ -21,6 +21,8 @@ Todo está configurado (Resend verificado, Turnstile y los 4 secretos cargados).
 
 - [ ] **Fer:** hacer un **registro real de prueba** en `/registro/` con un email propio (Claude no puede tildar el "no soy un robot"): recibir el código, verificarlo, ver llegar el aviso a sistemas@laemancipacion.com.ar, activar la cuenta en el panel y recibir el mail de cuenta activa.
 - [ ] **Fer:** con ese cliente, ingresar **con el usuario** (no el email), hacer un pedido y seguirlo: En espera → **Aceptar** (✓) o **Cancelar** (✕) desde `/pedidos/` → con un usuario Empleado abrirlo en Armando y marcarlo **Retirado**. Ver que el cliente vea cada estado y que los Indicadores del panel se actualicen.
+- [ ] **Fer:** con un Empleado, abrir un pedido en Armando, cargar las **pesadas** (kilos y cantidad) y los **bultos**, y marcarlo retirado.
+- [ ] **Fer:** pasar la **fórmula de bultos** para calcularlos solos (hoy se cargan a mano).
 - [ ] **Fer:** probar **+ Nuevo pedido** en `/pedidos/`: elegir el cliente, cargar cantidades y crear; ver que el cliente lo vea en Mis pedidos.
 - [ ] **Fer:** probar **Cuentas → Nueva cuenta** (por ejemplo un empleado) y que llegue el mail para elegir contraseña.
 - [ ] **Cooperativa:** revisar y aprobar el texto de los **términos y condiciones** (`/terminos/`, hoy en borrador).
