@@ -314,7 +314,7 @@ Cada plan nuevo se agrega al final con la misma estructura.
 
 ## Plan 15 — Íconos de redes de Flaticon (UIcons Brands)
 
-**Fecha:** 10/11/2026 · **Estado:** hecho
+**Fecha:** 10/11/2026 · **Estado:** reemplazado por el Plan 16
 
 **Pasos:**
 1. Los íconos dibujados de Instagram y Facebook se reemplazaron por los de **Flaticon UIcons Brands** que eligió Fer: `<i class="fi fi-brands-instagram"></i>` (icono 6422200) y `<i class="fi fi-brands-facebook"></i>` (icono 6422199).
@@ -324,3 +324,20 @@ Cada plan nuevo se agrega al final con la misma estructura.
 5. Versión de `styles.css` subida a `?v=8`. Probado: la fuente carga y los íconos se ven en gris y en rojo al pasar el mouse.
 
 **Archivos:** `index.html`, `404.html`, `css/styles.css`, `fonts/uicons-brands-nc.woff2`.
+
+---
+
+## Plan 16 — Íconos de redes sin crédito (Simple Icons, dominio público)
+
+**Fecha:** 10/11/2026 · **Estado:** hecho
+
+**Objetivo:** sacar del pie la leyenda "Íconos de redes: Uicons de Flaticon".
+
+**Pasos:**
+1. Se revisaron las condiciones de los íconos de **Magnific** que propuso Fer. Magnific es el nuevo nombre de Freepik desde abril de 2026, la misma empresa de Flaticon. Sus recursos gratuitos **exigen crédito** ("Designed by Magnific" con enlace, en el pie de la web), aunque se descarguen. Sin crédito solo con la suscripción Premium. No servían para el objetivo.
+2. Se eligió **Simple Icons** (paquete oficial `simple-icons` 16.37.0), que trae los glifos oficiales de Instagram y Facebook con licencia **CC0 1.0** (dominio público): uso comercial libre y **sin crédito**.
+3. Los dos íconos quedaron dibujados directamente en `index.html` (SVG, 20 px, mismo comportamiento: grises y rojos al pasar el mouse). Se borró la fuente de Flaticon (`fonts/uicons-brands-nc.woff2`) y sus estilos.
+4. Se quitó del pie "Íconos de redes: Uicons de Flaticon".
+5. Versión de `styles.css` subida a `?v=9`. Probado sin errores.
+
+**Archivos:** `index.html`, `404.html`, `css/styles.css`.
