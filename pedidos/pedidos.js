@@ -161,7 +161,7 @@
 
   const listar = async () => {
     let q = sb.from("pedidos")
-      .select("numero, estado, creado, total, observaciones, aceptado, retirado, cancelado, perfiles(usuario, nombre, apellido, email, cuit), pedido_items(count)")
+      .select("numero, estado, creado, total, observaciones, aceptado, retirado, cancelado, perfiles!pedidos_cliente_id_fkey(usuario, nombre, apellido, email, cuit), pedido_items(count)")
       .order("creado", { ascending: ["en_espera", "armando"].includes(filtro) })
       .limit(300);
     if (filtro !== "todos") q = q.eq("estado", filtro);

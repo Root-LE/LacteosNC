@@ -4,7 +4,7 @@
 
 -- 1. Quién cargó el pedido (null = lo hizo el propio cliente desde la web)
 alter table public.pedidos
-  add column if not exists cargado_por uuid references public.perfiles(id) on delete set null;
+  add column if not exists cargado_por uuid references auth.users(id) on delete set null;  -- ver migración 15
 
 -- 2. Crear un pedido para un cliente (solo administrador o superadministrador)
 create or replace function public.crear_pedido_para(

@@ -423,4 +423,6 @@ Cada plan nuevo se agrega al final con la misma estructura.
 
    En navegador, con datos simulados: búsqueda de clientes, cantidades inválidas marcadas en rojo y creación. La numeración quedó en **1001**.
 
-**Archivos:** `supabase/migrations/20261110_14_pedido_para_cliente.sql`, `pedidos/pedidos.js`, `pedidos/index.html`, `admin/admin.css`, `clientes/clientes.js`, `supabase/README.md`.
+5. **Corrección (migración 15):** al apuntar `cargado_por` a `perfiles` quedaron dos relaciones entre pedidos y perfiles y la solapa En espera mostraba "Could not embed because more than one relationship was found". Se cambió para que apunte a `auth.users`, como `aceptado_por` y las demás, y la página pide explícitamente la relación del cliente.
+
+**Archivos:** `supabase/migrations/20261110_14_pedido_para_cliente.sql`, `supabase/migrations/20261110_15_cargado_por_auth_users.sql`, `pedidos/pedidos.js`, `pedidos/index.html`, `admin/admin.css`, `clientes/clientes.js`, `supabase/README.md`.
