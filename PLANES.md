@@ -287,3 +287,25 @@ Cada plan nuevo se agrega al final con la misma estructura.
 3. `sitemap.xml` actualizado: se agregaron `/registro/` y `/terminos/` y se cambió la fecha. Las páginas privadas (`/admin/`, `/clientes/`, `/pedidos/`) siguen excluidas en `robots.txt`.
 4. **Sitemaps** → se envió `https://lacteosnc.com.ar/sitemap.xml`: "Se ha enviado el sitemap correctamente", 3 páginas descubiertas.
 5. Para revisar más adelante: Search Console → Páginas (qué está indexado) y Rendimiento (búsquedas y clics).
+
+---
+
+## Plan 14 — Ingresar, redes sociales y firma de La Emancipación en el pie
+
+**Fecha:** 10/11/2026 · **Estado:** hecho
+
+**Pasos:**
+1. Google ya muestra `lacteosnc.com.ar` indexada (confirmado por Fer).
+2. Menú: el botón **Login** pasó a decir **Ingresar** (sigue llevando a `/admin/`).
+3. Al lado de Ingresar se agregaron los íconos de **Instagram** (`https://www.instagram.com/lacteosncla/`) y **Facebook** (`https://www.facebook.com/p/L%C3%A1cteos-NC-61564084072348/`):
+   - se abren en otra pestaña;
+   - son grises y se ponen rojos con el ícono blanco al pasar el mouse;
+   - en el celular quedan centrados debajo de Ingresar, que ahora ocupa todo el ancho como Contacto.
+4. Las dos redes se agregaron también en los datos para Google (`sameAs` del JSON-LD).
+5. **Pie de página**, debajo de Institucional · Productos · Novedades · Contacto: "Lácteos NC es una marca de" + logo de La Emancipación.
+   - El logo es `img/logo-la-emancipacion.png` / `.webp`, recortado de `laemancipacionSinfondo.png`.
+   - Mide 52 px de alto, menos que el sello NC de la izquierda (70 px).
+   - El texto de la izquierda pasó a "Quesos, cremas y dulce de leche elaborados en Jacinto Arauz, La Pampa." para no repetir la leyenda.
+6. Versión de `styles.css` subida a `?v=7` en `index.html` y `404.html`. Probado en computadora y celular, sin errores.
+
+**Archivos:** `index.html`, `404.html`, `css/styles.css`, `img/logo-la-emancipacion.png`, `img/logo-la-emancipacion.webp`.
