@@ -394,3 +394,33 @@ Cada plan nuevo se agrega al final con la misma estructura.
 7. Probado en la base con una transacción que se deshace (duplicados, permisos de cada rol, cada cambio de estado, eventos y KPIs) y en navegador con datos simulados (vista admin, vista empleado, ingreso con usuario, nueva cuenta, indicadores). La numeración de pedidos se volvió a dejar en **1001**.
 
 **Archivos:** `supabase/migrations/20261110_13a_estado_cancelado.sql`, `supabase/migrations/20261110_13b_pedidos_aceptar_kpis.sql`, `supabase/functions/cuentas/index.ts`, `admin/*`, `pedidos/*`, `clientes/clientes.js`, `js/cuenta.js`, `supabase/README.md`.
+
+---
+
+## Plan 19 — El administrador carga pedidos a nombre de un cliente
+
+**Fecha:** 10/11/2026 · **Estado:** hecho (falta la prueba real de Fer)
+
+**Pedido de Fer:** que superadmin y administrador puedan crear un pedido y asignárselo a un cliente (por ejemplo, el cliente lo pasa por WhatsApp), que quede asociado a ese cliente y que él lo vea.
+
+**Pasos:**
+1. **Migración 14:**
+   - columna `cargado_por` en `pedidos`;
+   - función `crear_pedido_para(cliente, renglones, observaciones, aceptar)`, solo para administradores. Solo admite clientes con cuenta activa y usa los precios de la lista **del cliente**;
+   - si se marca "aceptar" (viene marcado), el pedido entra directo en **Armando** y lo ven los empleados; si no, queda **En espera**;
+   - el detalle del pedido y el evento `pedido_nuevo` para el bot dicen quién lo cargó y en qué estado entró.
+2. **`/pedidos/`:** botón **+ Nuevo pedido** (solo administradores):
+   - buscar el cliente por usuario, nombre o CUIT;
+   - se ven sus precios, con buscador de artículos y la cantidad en cada renglón (acepta decimales con coma);
+   - total estimado, observaciones y la casilla "Aceptarlo ahora";
+   - al crear, muestra el pedido con su número.
+3. **Área de clientes:** el cliente ve el pedido en Mis pedidos, con la nota "Pedido cargado por la cooperativa".
+4. Probado en la base con una transacción que se deshace:
+   - el empleado no puede cargar pedidos;
+   - aceptado entra en armando y sin aceptar queda en espera;
+   - no se puede cargar a nombre de alguien que no es cliente;
+   - el cliente ve sus pedidos.
+
+   En navegador, con datos simulados: búsqueda de clientes, cantidades inválidas marcadas en rojo y creación. La numeración quedó en **1001**.
+
+**Archivos:** `supabase/migrations/20261110_14_pedido_para_cliente.sql`, `pedidos/pedidos.js`, `pedidos/index.html`, `admin/admin.css`, `clientes/clientes.js`, `supabase/README.md`.

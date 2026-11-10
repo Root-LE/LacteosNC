@@ -197,6 +197,7 @@
           titulo: `Pedido N.º ${p.numero}`, ancho: true,
           cuerpo: `<div class="ficha"><div><b>Fecha</b>${esc(fecha(p.creado))}</div><div><b>Estado</b>${chipPedido(p.estado)}</div>
               <div><b>Total estimado</b>${esc(plata(p.total))}</div></div>
+            ${p.cargado_por ? `<p class="ayuda">Pedido cargado por la cooperativa.</p>` : ""}
             ${p.estado === "cancelado" ? `<p class="nota"><b>La cooperativa canceló este pedido.</b>${p.motivo_cancelacion ? " Motivo: " + esc(p.motivo_cancelacion) : ""}</p>` : ""}
             ${p.estado === "en_espera" ? '<p class="nota">La cooperativa todavía no confirmó este pedido.</p>' : ""}
             ${tablaRenglones(p.items)}

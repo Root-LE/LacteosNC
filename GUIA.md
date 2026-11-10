@@ -52,7 +52,7 @@ js/main.js      Menú, catálogo y novedades (desde Supabase, con lista de respa
 admin/          Login único (email o usuario) y panel: indicadores, productos, artículos, novedades, listas, precios, cuentas, actividad
 registro/       Registro de clientes con código de 6 dígitos
 clientes/       Área de clientes: lista de precios, pedido tipo carrito, mis pedidos
-pedidos/        Página Pedidos: el admin acepta o cancela (En espera); el empleado ve Armando y marca Retirado
+pedidos/        Página Pedidos: el admin acepta o cancela (En espera) y carga pedidos por un cliente; el empleado ve Armando y marca Retirado
 terminos/       Términos y condiciones
 js/cuenta.js    Funciones compartidas por registro, clientes y pedidos
 supabase/       Migraciones SQL y documentación de la base (supabase/README.md)

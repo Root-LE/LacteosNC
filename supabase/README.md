@@ -32,7 +32,7 @@ las que ya se aplicaron.
 | `articulos` | Los códigos del sistema de la cooperativa (campo ARTICULO) con su descripción (DENOMINACION); pueden pertenecer a un producto de la web; activo/inactivo |
 | `precios` | Precio de cada **artículo** en cada lista |
 | `novedades` | Título, descripción, datos, foto / YouTube / video, producto relacionado |
-| `pedidos` | Número (desde 1001), cliente, lista, estado, observaciones, total, quién lo aceptó, abrió, retiró o canceló (y el motivo) |
+| `pedidos` | Número (desde 1001), cliente, lista, estado, observaciones, total, quién lo cargó (si lo hizo un administrador por el cliente), aceptó, abrió, retiró o canceló (y el motivo) |
 | `pedido_items` | Renglones: artículo, código, descripción, cantidad, precio unitario y subtotal (copiados al crear el pedido) |
 | `mensajes_contacto` | Mensajes del formulario de contacto |
 | `eventos` | Novedades automáticas para el bot: cliente para activar, cuenta activada o bloqueada, pedido nuevo, armando y retirado (con los datos completos en `datos`) |
@@ -67,6 +67,7 @@ Usuario y email son **únicos** (sin distinguir mayúsculas): la base no deja re
 | `crear_pedido(p_items, p_observaciones)` | Cliente activo | Crea el pedido con los precios de su lista. `p_items` = `[{"articulo_id":1,"cantidad":2}]`. Devuelve número y detalle. |
 | `detalle_pedido(p_numero)` | Dueño o personal | Devuelve el pedido con cliente, renglones, fechas y motivo de cancelación (el empleado solo los aceptados). |
 | `abrir_pedido(p_numero)` | Empleado / admin | Devuelve el detalle (ya no cambia el estado; anota quién lo abrió primero). |
+| `crear_pedido_para(p_cliente, p_items, p_observaciones, p_aceptar)` | Administrador | Carga un pedido **a nombre de un cliente activo** (ej.: lo pasó por WhatsApp), con los precios de la lista de ese cliente. Con `p_aceptar` = true (por defecto) entra directo en *armando*; si no, queda *en espera*. El cliente lo ve en Mis pedidos. |
 | `aceptar_pedido(p_numero)` | Administrador | Pasa de *en espera* a *armando*. |
 | `cancelar_pedido(p_numero, p_motivo)` | Administrador | Pasa de *en espera* a *cancelado*, con motivo opcional (hasta 300 caracteres). |
 | `marcar_retirado(p_numero)` | Empleado / admin | Pasa de *armando* a *retirado*. |
@@ -128,7 +129,7 @@ Los guarda la base sola (disparadores), pase lo que pase en la web:
 |---|---|---|
 | `cliente_para_activar` | un cliente verificó su email | usuario, nombre, apellido, email, CUIT |
 | `cuenta_activada` / `cuenta_bloqueada` | un administrador activó o bloqueó una cuenta | lo mismo + rol, lista y estado anterior |
-| `pedido_nuevo` | un cliente confirmó un pedido | número, total, observaciones, cliente y renglones (código, descripción, cantidad, precio) |
+| `pedido_nuevo` | un cliente confirmó un pedido, o un administrador lo cargó por él | número, total, observaciones, cliente, renglones (código, descripción, cantidad, precio), `estado` (en_espera o armando) y `cargado_por` (usuario del administrador, o vacío si lo hizo el cliente) |
 | `pedido_aceptado` / `pedido_retirado` / `pedido_cancelado` | un administrador aceptó o canceló el pedido, o se retiró | lo mismo + `por` (usuario que lo cambió) y, si se canceló, `motivo` |
 | `pedido_armando` | (tipo viejo, ya no se genera: ahora es `pedido_aceptado`) | |
 
