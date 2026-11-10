@@ -110,10 +110,19 @@ p { margin: 0 0 1em; }
 /* Botón Login: contorno rojo, se llena al pasar el mouse */
 .nav .nav__login { display: inline-flex; align-items: center; gap: .4rem; color: var(--rojo); border: 2px solid var(--rojo); border-radius: 999px; padding: .55rem 1rem; margin-left: .2rem; }
 .nav .nav__login:hover, .nav .nav__login:focus-visible { color: var(--blanco); }
+/* Íconos de redes: Uicons Brands de Flaticon (https://www.flaticon.es/uicons).
+   Fuente recortada a solo Instagram (U+F16E) y Facebook (U+F14F): fonts/uicons-brands-nc.woff2 */
+@font-face { font-family: "uicons-brands"; src: url("../fonts/uicons-brands-nc.woff2") format("woff2"); font-display: swap; }
+.fi { display: inline-flex; line-height: 1; }
+.fi::before { font-family: "uicons-brands" !important; font-style: normal; font-weight: 400 !important; line-height: 1;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.fi-brands-instagram::before { content: "\f16e"; }
+.fi-brands-facebook::before { content: "\f14f"; }
 /* Redes sociales al lado de Ingresar */
 .nav .nav__redes { display: flex; align-items: center; gap: .1rem; margin-left: .3rem; }
 .nav .nav__social { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border-radius: 50%; color: var(--tinta); background: transparent; }
 .nav .nav__social::before { content: none; }
+.nav .nav__social .fi { font-size: 20px; }
 .nav .nav__social:hover, .nav .nav__social:focus-visible { color: var(--blanco); background: var(--rojo); }
 
 /* ---- Estilo PELUCHE (predeterminado: <nav class="nav nav--peluche">) ----
@@ -406,6 +415,7 @@ p { margin: 0 0 1em; }
 .footer__derecha { display: grid; gap: 1.1rem; justify-items: end; }
 .footer__firma { display: flex; align-items: center; gap: .8rem; margin: 0; font-size: .95rem; color: #B9B3B4; }
 .footer__firma img { height: 52px; width: auto; max-width: 100%; display: block; }
+.footer__credito a { color: inherit; }
 .footer__copy { grid-column: 1 / -1; margin: 0; font-size: .9rem; color: #9C9697; }
 
 /* ========================== DETALLE ========================== */

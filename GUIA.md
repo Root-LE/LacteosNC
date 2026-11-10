@@ -12,7 +12,7 @@ Leer antes de empezar cualquier tarea.
    - sacarla de `PENDIENTES.md` (o marcarla como hecha),
    - agregar en `PLANES.md` el plan implementado con sus pasos.
 5. **No tener abiertos en un editor** (VS Code, Notepad++, etc.) los archivos que se están modificando por otro lado: al guardar, el editor pisa los cambios nuevos con la versión vieja. Ya pasó una vez con `index.html`.
-6. **Al cambiar `css/styles.css` o `js/main.js`**, subir el número de versión en los enlaces de `index.html` y `404.html` (ej. `?v=7` → `?v=8`). Si no, los visitantes siguen viendo la versión vieja guardada en su navegador.
+6. **Al cambiar `css/styles.css` o `js/main.js`**, subir el número de versión en los enlaces de `index.html` y `404.html` (ej. `?v=8` → `?v=9`). Si no, los visitantes siguen viendo la versión vieja guardada en su navegador.
 7. **Probar en el navegador con Ctrl + F5** (recarga sin caché) después de cada cambio.
 8. **Nunca subir contraseñas ni claves secretas** al repositorio. La clave pública (anon/publishable) de Supabase sí puede ir en el código; la `service_role` jamás.
 9. Hacer los cambios de base de datos en Supabase siempre con **migraciones** (archivos SQL con nombre y fecha), nunca a mano sin dejar registro.
@@ -57,7 +57,7 @@ terminos/       Términos y condiciones
 js/cuenta.js    Funciones compartidas por registro, clientes y pedidos
 supabase/       Migraciones SQL y documentación de la base (supabase/README.md)
 img/            Logos, fotos de productos (grande y -sm) y capas de leche (.webp)
-fonts/          Barlow, Barlow Condensed y Yellowtail, alojadas en el sitio
+fonts/          Barlow, Barlow Condensed y Yellowtail, más los íconos de redes de Flaticon (uicons-brands-nc.woff2, con crédito en el pie)
 robots.txt, sitemap.xml, _headers   Archivos para Google y Cloudflare
 README.md       Cómo publicar
 GUIA.md         Esta guía

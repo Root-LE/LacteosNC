@@ -309,3 +309,18 @@ Cada plan nuevo se agrega al final con la misma estructura.
 6. Versión de `styles.css` subida a `?v=7` en `index.html` y `404.html`. Probado en computadora y celular, sin errores.
 
 **Archivos:** `index.html`, `404.html`, `css/styles.css`, `img/logo-la-emancipacion.png`, `img/logo-la-emancipacion.webp`.
+
+---
+
+## Plan 15 — Íconos de redes de Flaticon (UIcons Brands)
+
+**Fecha:** 10/11/2026 · **Estado:** hecho
+
+**Pasos:**
+1. Los íconos dibujados de Instagram y Facebook se reemplazaron por los de **Flaticon UIcons Brands** que eligió Fer: `<i class="fi fi-brands-instagram"></i>` (icono 6422200) y `<i class="fi fi-brands-facebook"></i>` (icono 6422199).
+2. Se tomó la fuente oficial del paquete `@flaticon/flaticon-uicons` 3.3.1 y se recortó a esos 2 íconos (`fonts/uicons-brands-nc.woff2`, 600 bytes en vez de 37 KB). Queda alojada en el sitio, como las demás tipografías.
+3. Las clases `fi`, `fi-brands-instagram` y `fi-brands-facebook` están en `css/styles.css` con los mismos códigos de Flaticon (`\f16e` y `\f14f`).
+4. **Licencia:** el uso gratuito de Flaticon exige darles crédito. Se agregó en el pie: "Íconos de redes: Uicons de Flaticon", con enlace a https://www.flaticon.es/uicons. Con una suscripción Premium de Flaticon se podría quitar.
+5. Versión de `styles.css` subida a `?v=8`. Probado: la fuente carga y los íconos se ven en gris y en rojo al pasar el mouse.
+
+**Archivos:** `index.html`, `404.html`, `css/styles.css`, `fonts/uicons-brands-nc.woff2`.
