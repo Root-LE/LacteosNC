@@ -8,7 +8,8 @@
 //   MAIL_REMITENTE    ej.: Lácteos NC <no-responder@lacteosnc.com.ar>
 //   TURNSTILE_SECRET  clave secreta de Cloudflare Turnstile ("no soy un robot")
 //   MAIL_AVISOS       (opcional) mail que recibe el aviso de clientes nuevos
-// Acciones: registrar, verificar, reenviar, estado, avisar_activacion, recuperar
+// Acciones: registrar, verificar, reenviar, estado, avisar_activacion, recuperar,
+//           ingresar (con usuario), crear_usuario (solo administradores)
 // =====================================================================
 import { createClient } from "npm:@supabase/supabase-js@2.119.0";
 
@@ -240,7 +241,7 @@ async function avisarActivacion(d: Record<string, unknown>, jwt: string | null) 
       <p>La cooperativa activó tu cuenta. Ya podés ver tu lista de precios y hacer pedidos.</p>
       <table role="presentation" style="margin:12px 0;font-size:15px"><tr><td style="padding:4px 12px 4px 0;color:#666">Usuario</td><td><strong>${esc(c.usuario)}</strong></td></tr>
       <tr><td style="padding:4px 12px 4px 0;color:#666">Email</td><td><strong>${esc(c.email)}</strong></td></tr></table>
-      <p>Para ingresar usá tu email y la contraseña que elegiste al registrarte.</p>
+      <p>Para ingresar usá tu usuario o tu email, y la contraseña que elegiste al registrarte.</p>
       <p><a href="${destino}" style="display:inline-block;background:#E1141C;color:#fff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Ingresar</a></p>`),
     `La cooperativa activó tu cuenta de Lácteos NC. Usuario: ${c.usuario}. Email: ${c.email}. Ingresá en ${destino}`);
   return { ok: true };
@@ -274,6 +275,105 @@ async function recuperar(d: Record<string, unknown>) {
   return respuesta;
 }
 
+// Ingreso con nombre de usuario: se busca el email en el servidor (nunca se le muestra al visitante)
+// 5 errores seguidos con el mismo usuario = 15 minutos de espera.
+const sbPublico = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+  auth: { persistSession: false, autoRefreshToken: false },
+});
+async function ingresar(d: Record<string, unknown>) {
+  const usuario = String(d.usuario ?? "").trim();
+  const clave = String(d.clave ?? "");
+  if (!/^[A-Za-z0-9._-]{3,30}$/.test(usuario) || !clave) throw new Falla(400, "Usuario o contraseña incorrectos.");
+  const { data: b } = await sb.rpc("ingreso_buscar", { p_usuario: usuario });
+  if (b?.espera_seg > 0) throw new Falla(429, `Demasiados intentos. Esperá ${esperaTexto(b.espera_seg)} y probá de nuevo.`);
+  if (!b?.email) {
+    await sb.rpc("ingreso_resultado", { p_usuario: usuario, p_ok: false });
+    throw new Falla(400, "Usuario o contraseña incorrectos.");
+  }
+  const { data, error } = await sbPublico.auth.signInWithPassword({ email: b.email, password: clave });
+  if (error || !data.session) {
+    await sb.rpc("ingreso_resultado", { p_usuario: usuario, p_ok: false });
+    throw new Falla(400, "Usuario o contraseña incorrectos.");
+  }
+  await sb.rpc("ingreso_resultado", { p_usuario: usuario, p_ok: true });
+  return { ok: true, access_token: data.session.access_token, refresh_token: data.session.refresh_token };
+}
+
+// Alta de cuentas desde el panel (administrador: clientes y empleados; superadministrador: todos los roles).
+// La cuenta queda activa y la persona recibe un mail para elegir su propia contraseña.
+async function crearUsuario(d: Record<string, unknown>, jwt: string | null) {
+  if (!jwt) throw new Falla(401, "Sin sesión.");
+  const { data: u } = await sb.auth.getUser(jwt);
+  if (!u?.user) throw new Falla(401, "Sesión vencida. Volvé a ingresar.");
+  const { data: yo } = await sb.from("perfiles").select("rol, estado").eq("id", u.user.id).single();
+  if (!yo || yo.estado !== "activa" || !["administrador", "superadmin"].includes(yo.rol)) throw new Falla(403, "No tenés permiso para crear cuentas.");
+
+  const email = String(d.email ?? "").trim().toLowerCase();
+  const usuario = String(d.usuario ?? "").trim();
+  const nombre = String(d.nombre ?? "").trim().slice(0, 80);
+  const apellido = String(d.apellido ?? "").trim().slice(0, 80);
+  const cuit = String(d.cuit ?? "").replace(/\D/g, "");
+  const rol = String(d.rol ?? "cliente");
+  const lista = d.lista_id ? Number(d.lista_id) : null;
+
+  if (!EMAIL_RE.test(email)) throw new Falla(400, "Revisá el email.");
+  if (!/^[A-Za-z0-9._-]{3,30}$/.test(usuario)) throw new Falla(400, "El usuario debe tener entre 3 y 30 caracteres: letras, números, punto o guion.");
+  if (!nombre) throw new Falla(400, "Escribí el nombre.");
+  if (!["cliente", "empleado", "administrador", "superadmin"].includes(rol)) throw new Falla(400, "Rol inválido.");
+  if (["administrador", "superadmin"].includes(rol) && yo.rol !== "superadmin") throw new Falla(403, "Solo un superadministrador puede crear administradores.");
+  if (rol === "cliente") {
+    if (!cuitValido(cuit)) throw new Falla(400, "Para un cliente el CUIT es obligatorio y tiene que ser válido.");
+    if (!lista) throw new Falla(400, "Elegí la lista de precio del cliente.");
+  } else if (cuit && !cuitValido(cuit)) throw new Falla(400, "El CUIT no es válido.");
+
+  const [{ data: e1 }, { data: e2 }, { data: e3 }] = await Promise.all([
+    sb.from("perfiles").select("id").eq("email", email).maybeSingle(),
+    sb.from("perfiles").select("id").ilike("usuario", usuario.replace(/[\\_%]/g, "\\$&")).maybeSingle(),
+    cuit ? sb.from("perfiles").select("id").eq("cuit", cuit).maybeSingle() : Promise.resolve({ data: null }),
+  ]);
+  if (e1) throw new Falla(409, "Ya existe una cuenta con ese email.");
+  if (e2) throw new Falla(409, "Ese usuario ya está en uso. Elegí otro.");
+  if (e3) throw new Falla(409, "Ya existe una cuenta con ese CUIT.");
+
+  const azar = crypto.getRandomValues(new Uint8Array(24));
+  const claveTemporal = btoa(String.fromCharCode(...azar)) + "Aa1!";
+  const { data: creado, error } = await sb.auth.admin.createUser({
+    email, password: claveTemporal, email_confirm: true,
+    user_metadata: { nombre, apellido, cuit: cuit || null, creado_por_admin: true },
+  });
+  if (error || !creado.user) { console.error("createUser", error); throw new Falla(400, "No se pudo crear la cuenta."); }
+
+  const { error: e4 } = await sb.from("perfiles").update({
+    usuario, rol, lista_precio_id: lista, estado: "activa", activado: new Date().toISOString(), activado_por: u.user.id,
+  }).eq("id", creado.user.id);
+  if (e4) {
+    console.error("perfil", e4);
+    await sb.auth.admin.deleteUser(creado.user.id);
+    throw new Falla(400, /duplicate/i.test(e4.message) ? "Ese usuario o CUIT ya está en uso." : "No se pudo completar la cuenta.");
+  }
+
+  // Mail de bienvenida con enlace para elegir la contraseña
+  let mailOk = true;
+  try {
+    const { data: link } = await sb.auth.admin.generateLink({ type: "recovery", email });
+    const enlace = `${SITIO}/admin/?recuperar=${encodeURIComponent(link!.properties!.hashed_token)}`;
+    await mandarMail(email, "Te creamos una cuenta en Lácteos NC",
+      plantilla("¡Bienvenido/a a Lácteos NC!", `<p>Hola${nombre ? " " + esc(nombre) : ""}:</p>
+        <p>La cooperativa te creó una cuenta${rol === "cliente" ? " para que veas tu lista de precios y hagas pedidos" : ""}.</p>
+        <table role="presentation" style="margin:12px 0;font-size:15px"><tr><td style="padding:4px 12px 4px 0;color:#666">Usuario</td><td><strong>${esc(usuario)}</strong></td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#666">Email</td><td><strong>${esc(email)}</strong></td></tr></table>
+        <p>Para empezar, elegí tu contraseña:</p>
+        <p style="margin:20px 0"><a href="${enlace}" style="display:inline-block;background:#E1141C;color:#fff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Elegir mi contraseña</a></p>
+        <p style="font-size:13px;color:#666">El enlace vence en 1 hora. Si venció, entrá a ${SITIO}/admin/ y tocá "Olvidé mi contraseña".</p>
+        <p style="font-size:13px;color:#666">Después podés ingresar con tu usuario o tu email.</p>`),
+      `La cooperativa te creó una cuenta en Lácteos NC. Usuario: ${usuario}. Elegí tu contraseña acá (vence en 1 hora): ${enlace}`);
+  } catch (e) { console.error("mail bienvenida", e); mailOk = false; }
+
+  return { ok: true, mail: mailOk, mensaje: mailOk
+    ? `Cuenta creada. Le enviamos a ${email} un mail para elegir su contraseña.`
+    : `Cuenta creada, pero no se pudo enviar el mail. Pedile que use "Olvidé mi contraseña" con ${email}.` };
+}
+
 // ------------------------------------------------------------------ servidor
 Deno.serve(async (req) => {
   const h = cors(req.headers.get("Origin"));
@@ -293,6 +393,8 @@ Deno.serve(async (req) => {
       case "estado": return responder(200, await estado(d));
       case "avisar_activacion": return responder(200, await avisarActivacion(d, jwt));
       case "recuperar": return responder(200, await recuperar(d));
+      case "ingresar": return responder(200, await ingresar(d));
+      case "crear_usuario": return responder(200, await crearUsuario(d, jwt));
       default: return responder(400, { error: "Acción desconocida" });
     }
   } catch (e) {

@@ -40,7 +40,7 @@
   // Traduce los errores más comunes a algo entendible
   const mensajeError = err => {
     const m = String(err?.message || err || "");
-    if (/Invalid login credentials/i.test(m)) return "Email o contraseña incorrectos.";
+    if (/Invalid login credentials/i.test(m)) return "Email, usuario o contraseña incorrectos.";
     if (/Email not confirmed/i.test(m)) return "Ese email todavía no está confirmado.";
     if (/duplicate key.*codigo/i.test(m)) return "Ya existe un artículo con ese código.";
     if (/duplicate key.*slug/i.test(m)) return "Ya existe un producto con ese nombre. Cambiá el nombre.";
@@ -621,7 +621,8 @@
     const pendientes = cuentas.filter(c => c.estado === "pendiente_activacion").length;
     const filtradas = filtroCuentas === "todas" ? cuentas : cuentas.filter(c => c.estado === filtroCuentas);
     contenido.innerHTML = cabecera("Cuentas",
-      `Los clientes se registran desde la web. Para activar una cuenta asignale un <strong>usuario</strong> y una <strong>lista de precio</strong>.${pendientes ? ` Hay <strong>${pendientes}</strong> pendiente${pendientes > 1 ? "s" : ""} de activación.` : ""}`) + `
+      `Los clientes se registran desde la web o los podés crear vos. Para activar una cuenta asignale un <strong>usuario</strong> y una <strong>lista de precio</strong>.${pendientes ? ` Hay <strong>${pendientes}</strong> pendiente${pendientes > 1 ? "s" : ""} de activación.` : ""}`,
+      `<button class="btn btn--rojo" id="nueva-cuenta">+ Nueva cuenta</button>`) + `
       <div class="herramientas">
         <select id="cu-filtro" aria-label="Filtrar cuentas">${opciones([
           { value: "pendiente_activacion", text: "Pendientes de activación" }, { value: "activa", text: "Activas" },
@@ -642,6 +643,7 @@
         </tr>`).join("") : '<tr><td colspan="8" class="vacio">No hay cuentas en este estado.</td></tr>'}</tbody>
       </table></div>`;
     $("#cu-filtro").onchange = e => { filtroCuentas = e.target.value; seccionCuentas(); };
+    $("#nueva-cuenta").onclick = nuevaCuenta;
     contenido.querySelectorAll("[data-editar]").forEach(b =>
       b.onclick = () => editarCuenta(cuentas.find(c => c.id === b.dataset.editar)));
   };
@@ -698,7 +700,9 @@
     cuenta_activada: ["Cuenta activada", "chip--verde"],
     cuenta_bloqueada: ["Cuenta bloqueada", "chip--rojo"],
     pedido_nuevo: ["Pedido nuevo", "chip--ambar"],
+    pedido_aceptado: ["Pedido aceptado", "chip"],
     pedido_armando: ["Pedido armando", "chip"],
+    pedido_cancelado: ["Pedido cancelado", "chip--rojo"],
     pedido_retirado: ["Pedido retirado", "chip--verde"]
   };
   let soloPendientes = true;
@@ -732,14 +736,148 @@
     contenido.querySelectorAll("[data-marcar]").forEach(b => b.onclick = () => marcar([Number(b.dataset.marcar)]));
   };
 
+  // Alta de una cuenta desde el panel: queda activa y la persona recibe un mail para elegir su contraseña
+  const nuevaCuenta = () => {
+    const roles = esSuper() ? ["cliente", "empleado", "administrador", "superadmin"] : ["cliente", "empleado"];
+    abrirVentana({
+      titulo: "Nueva cuenta",
+      textoGuardar: "Crear cuenta",
+      cuerpo: `
+        <div class="fila2">
+          <div><label for="nc-nombre">Nombre</label><input id="nc-nombre" required maxlength="80"></div>
+          <div><label for="nc-apellido">Apellido</label><input id="nc-apellido" maxlength="80"></div>
+        </div>
+        <div class="fila2">
+          <div><label for="nc-email">Email</label><input id="nc-email" type="email" required maxlength="254" autocomplete="off"></div>
+          <div><label for="nc-usr">Usuario</label><input id="nc-usr" required maxlength="30" placeholder="Ej.: Jperez" autocomplete="off">
+            <p class="ayuda">Único. Personal interno: inicial del nombre + apellido.</p></div>
+        </div>
+        <div class="fila2">
+          <div><label for="nc-rol">Rol</label><select id="nc-rol">${opciones(roles.map(r => ({ value: r, text: ROLES[r] })), "cliente")}</select></div>
+          <div><label for="nc-cuit">CUIT <span id="nc-cuit-oblig">(obligatorio para clientes)</span></label><input id="nc-cuit" inputmode="numeric" maxlength="13" placeholder="20-12345678-9"></div>
+        </div>
+        <div id="nc-caja-lista"><label for="nc-lista">Lista de precio</label>
+          <select id="nc-lista">${opciones(cache.listas.filter(l => l.activa).map(l => ({ value: l.id, text: `${l.nombre}${l.descripcion ? " — " + l.descripcion : ""}` })), "", "— Elegí una lista —")}</select></div>
+        <p class="ayuda">La cuenta queda <strong>activa</strong>. Le llega un mail de Lácteos NC para elegir su contraseña; después puede ingresar con su usuario o su email.</p>`,
+      onGuardar: async () => {
+        const rol = $("#nc-rol").value;
+        const datos = {
+          accion: "crear_usuario", nombre: $("#nc-nombre").value.trim(), apellido: $("#nc-apellido").value.trim(),
+          email: $("#nc-email").value.trim(), usuario: $("#nc-usr").value.trim(), rol,
+          cuit: $("#nc-cuit").value.replace(/\D/g, ""), lista_id: rol === "cliente" ? Number($("#nc-lista").value) || null : null
+        };
+        if (!datos.nombre) throw new Error("Escribí el nombre.");
+        if (!/^[A-Za-z0-9._-]{3,30}$/.test(datos.usuario)) throw new Error("El usuario debe tener entre 3 y 30 caracteres: letras, números, punto o guion.");
+        if (rol === "cliente" && datos.cuit.length !== 11) throw new Error("Para un cliente el CUIT es obligatorio (11 números).");
+        if (rol === "cliente" && !datos.lista_id) throw new Error("Elegí la lista de precio del cliente.");
+        const { data } = await sb.auth.getSession();
+        const r = await fetch(`${window.NC_CONFIG.supabaseUrl}/functions/v1/cuentas`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: window.NC_CONFIG.supabaseKey, Authorization: `Bearer ${data.session?.access_token}` },
+          body: JSON.stringify(datos)
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(j.error || "No se pudo crear la cuenta.");
+        avisar(j.mensaje, !j.mail);
+        filtroCuentas = "activa";
+        seccionCuentas();
+      }
+    });
+    const ajustar = () => {
+      const cliente = $("#nc-rol").value === "cliente";
+      $("#nc-caja-lista").hidden = !cliente;
+      $("#nc-cuit-oblig").textContent = cliente ? "(obligatorio)" : "(opcional)";
+    };
+    $("#nc-rol").onchange = ajustar;
+    $("#nc-cuit").oninput = e => {
+      const d = e.target.value.replace(/\D/g, "").slice(0, 11);
+      e.target.value = d.length > 10 ? `${d.slice(0, 2)}-${d.slice(2, 10)}-${d.slice(10)}` : d.length > 2 ? `${d.slice(0, 2)}-${d.slice(2)}` : d;
+    };
+    ajustar();
+  };
+
+  /* ---------- Indicadores (KPI) ---------- */
+  const seccionIndicadores = async () => {
+    const k = await q(sb.rpc("kpis"));
+    const P = k.pedidos, C = k.cuentas, G = k.catalogo;
+    const plata = n => "$ " + Number(n || 0).toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const num = n => Number(n || 0).toLocaleString("es-AR", { maximumFractionDigits: 2 });
+    const minutos = m => m == null ? "—" : m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`;
+    const tile = (titulo, valor, detalle = "", enlace = "") => `<${enlace ? `a href="${enlace}"` : "div"} class="kpi">
+      <span class="kpi__titulo">${esc(titulo)}</span><span class="kpi__valor">${esc(valor)}</span>${detalle ? `<span class="kpi__detalle">${detalle}</span>` : ""}</${enlace ? "a" : "div"}>`;
+
+    // Barras de pedidos por día (últimos 30 días)
+    const dias = k.por_dia || [];
+    const max = Math.max(1, ...dias.map(d => d.pedidos));
+    const W = 720, H = 180, base = H - 22, ancho = W / Math.max(1, dias.length);
+    const fechaCorta = f => { const [, m, d] = f.split("-"); return `${d}/${m}`; };
+    const barras = dias.map((d, i) => {
+      const h = d.pedidos ? Math.max(4, (d.pedidos / max) * (base - 14)) : 0;
+      const x = i * ancho + 1, w = Math.max(2, ancho - 2);
+      return `<g class="barra"><title>${fechaCorta(d.dia)}: ${d.pedidos} pedido${d.pedidos === 1 ? "" : "s"}</title>
+        <rect class="barra__zona" x="${i * ancho}" y="0" width="${ancho}" height="${base}" fill="transparent"/>
+        ${h ? `<path d="M${x},${base} v-${h - 4} q0,-4 4,-4 h${w - 8} q4,0 4,4 v${h - 4} z" fill="var(--rojo)"/>` : ""}</g>`;
+    }).join("");
+    const etiquetas = dias.map((d, i) => i % 5 === 4 || i === dias.length - 1
+      ? `<text x="${i * ancho + ancho / 2}" y="${H - 6}" text-anchor="middle">${fechaCorta(d.dia)}</text>` : "").join("");
+
+    const lista = (filas, vacio, fila) => filas.length ? `<table class="kpi-tabla"><tbody>${filas.map(fila).join("")}</tbody></table>` : `<p class="vacio">${vacio}</p>`;
+
+    contenido.innerHTML = cabecera("Indicadores",
+      "Resumen de pedidos y cuentas. Los totales son estimados (precios de lista, sin contar pedidos cancelados). El mes es el mes calendario actual.",
+      `<button class="btn btn--linea" id="kpi-actualizar">Actualizar</button>`) + `
+      <div class="kpis">
+        ${tile("Pedidos en espera", num(P.en_espera), "Para aceptar o cancelar", "/pedidos/#en_espera")}
+        ${tile("Armando", num(P.armando), "Aceptados, esperando retiro", "/pedidos/#armando")}
+        ${tile("Pedidos hoy", num(P.hoy), `${num(P.semana)} en los últimos 7 días`)}
+        ${tile("Pedidos del mes", num(P.mes), `${num(P.retirados_mes)} retirados · ${num(P.cancelados_mes)} cancelados`)}
+        ${tile("Total estimado del mes", plata(P.total_mes), `Promedio por pedido ${plata(P.promedio_mes)}`)}
+        ${tile("Tiempo para aceptar", minutos(P.min_aceptar), `Aceptado → retirado: ${minutos(P.min_retirar)}`)}
+        ${tile("Clientes activos", num(C.clientes_activos), `${num(C.nuevos_mes)} nuevos este mes`, "#cuentas")}
+        ${tile("Cuentas para activar", num(C.para_activar), `${num(C.sin_verificar)} sin verificar el mail`, "#cuentas")}
+      </div>
+      <div class="kpi-bloques">
+        <section class="kpi-bloque kpi-bloque--ancho">
+          <h2>Pedidos por día <small>últimos 30 días, sin cancelados</small></h2>
+          <svg class="grafico" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pedidos por día en los últimos 30 días">
+            <line x1="0" y1="${base}" x2="${W}" y2="${base}" class="grafico__base"/>
+            <text x="0" y="10" class="grafico__max">${max} ${max === 1 ? "pedido" : "pedidos"}</text>
+            <line x1="0" y1="14" x2="${W}" y2="14" class="grafico__guia"/>
+            ${barras}${etiquetas}
+          </svg>
+          <details class="kpi-datos"><summary>Ver como tabla</summary>
+            ${lista(dias.filter(d => d.pedidos), "Sin pedidos en los últimos 30 días.", d => `<tr><td>${fechaCorta(d.dia)}</td><td class="num">${d.pedidos}</td></tr>`)}
+          </details>
+        </section>
+        <section class="kpi-bloque">
+          <h2>Artículos más pedidos <small>este mes</small></h2>
+          ${lista(k.top_articulos || [], "Todavía no hay pedidos este mes.", a => `<tr><td><strong>${esc(a.codigo)}</strong> ${esc(a.descripcion)}</td><td class="num">${num(a.cantidad)}<br><small>${a.pedidos} ped.</small></td></tr>`)}
+        </section>
+        <section class="kpi-bloque">
+          <h2>Clientes con más pedidos <small>este mes</small></h2>
+          ${lista(k.top_clientes || [], "Todavía no hay pedidos este mes.", c => `<tr><td><strong>${esc(c.usuario || "—")}</strong> ${esc(c.nombre)}</td><td class="num">${c.pedidos} ped.<br><small>${plata(c.total)}</small></td></tr>`)}
+        </section>
+        <section class="kpi-bloque">
+          <h2>Catálogo</h2>
+          <table class="kpi-tabla"><tbody>
+            <tr><td>Artículos activos</td><td class="num">${num(G.articulos_activos)}</td></tr>
+            <tr><td>Tarjetas visibles en la web</td><td class="num">${num(G.tarjetas_visibles)}</td></tr>
+            <tr><td><a href="#productos">Tarjetas sin foto</a></td><td class="num">${num(G.tarjetas_sin_foto)}</td></tr>
+            <tr><td>Empleados activos</td><td class="num">${num(C.empleados)}</td></tr>
+          </tbody></table>
+        </section>
+      </div>`;
+    $("#kpi-actualizar").onclick = () => seccionIndicadores().catch(ex => avisar(mensajeError(ex), true));
+  };
+
   /* =====================================================================
      NAVEGACIÓN, SESIÓN E INGRESO
      ===================================================================== */
-  const SECCIONES = { productos: seccionProductos, articulos: seccionArticulos, novedades: seccionNovedades,
+  const SECCIONES = { indicadores: seccionIndicadores, productos: seccionProductos, articulos: seccionArticulos, novedades: seccionNovedades,
     listas: seccionListas, precios: seccionPrecios, cuentas: seccionCuentas, actividad: seccionActividad };
 
   const irA = async () => {
-    const nombre = SECCIONES[location.hash.slice(1)] ? location.hash.slice(1) : "productos";
+    const nombre = SECCIONES[location.hash.slice(1)] ? location.hash.slice(1) : "indicadores";
     document.querySelectorAll(".menu a").forEach(a => a.toggleAttribute("aria-current", a.getAttribute("href") === "#" + nombre));
     document.querySelectorAll(".menu a[aria-current]").forEach(a => a.setAttribute("aria-current", "page"));
     contenido.innerHTML = '<p class="vacio">Cargando…</p>';
@@ -789,7 +927,9 @@
     $("#ingreso-titulo").textContent = recuperar ? "Recuperar contraseña" : "Ingresar";
     $("#ingreso-ayuda").textContent = recuperar
       ? "Escribí el email de tu cuenta y te enviamos un enlace para elegir una contraseña nueva."
-      : "Clientes y personal de la cooperativa: ingresá con tu email y contraseña.";
+      : "Clientes y personal de la cooperativa: ingresá con tu email o tu usuario y tu contraseña.";
+    $("#i-email-label").textContent = recuperar ? "Email" : "Email o usuario";
+    $("#i-email").type = recuperar ? "email" : "text";
     $("#campo-clave").hidden = recuperar;
     $("#i-clave").required = !recuperar;
     $("#btn-ingresar").textContent = recuperar ? "Solicitar nueva contraseña" : "Ingresar";
@@ -818,7 +958,9 @@
     const btn = $("#btn-ingresar");
     const email = $("#i-email").value.trim();
     err.hidden = true; ok.hidden = true;
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "Escribí un email válido."; err.hidden = false; return; }
+    const esEmail = email.includes("@");
+    if (modoRecuperar && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "Escribí un email válido."; err.hidden = false; return; }
+    if (!modoRecuperar && !esEmail && !/^[A-Za-z0-9._-]{3,30}$/.test(email)) { err.textContent = "Escribí tu email o tu usuario."; err.hidden = false; return; }
     btn.disabled = true;
     try {
       if (modoRecuperar) {
@@ -827,10 +969,26 @@
         ok.hidden = false;
         return;
       }
-      const { data } = await sb.auth.signInWithPassword({ email, password: $("#i-clave").value })
-        .then(r => { if (r.error) throw r.error; return r; });
+      let session;
+      if (esEmail) {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password: $("#i-clave").value });
+        if (error) throw error;
+        session = data.session;
+      } else {
+        // Con usuario: el servidor busca el email y devuelve la sesión (nunca muestra el email)
+        const r = await fetch(`${window.NC_CONFIG.supabaseUrl}/functions/v1/cuentas`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: window.NC_CONFIG.supabaseKey },
+          body: JSON.stringify({ accion: "ingresar", usuario: email, clave: $("#i-clave").value })
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(j.error || "Usuario o contraseña incorrectos.");
+        const { data, error } = await sb.auth.setSession({ access_token: j.access_token, refresh_token: j.refresh_token });
+        if (error) throw error;
+        session = data.session;
+      }
       $("#i-clave").value = "";
-      await entrar(data.session);
+      await entrar(session);
     } catch (ex) {
       if (!modoRecuperar && /Email not confirmed/i.test(ex?.message || "")) {
         err.innerHTML = `Todavía no verificaste tu email. <a href="/registro/?verificar=${encodeURIComponent(email)}">Ingresá el código que te enviamos</a>.`;

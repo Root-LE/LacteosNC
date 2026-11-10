@@ -170,7 +170,7 @@
         <p class="numero">N.º ${esc(p.numero)}</p>${chipPedido(p.estado)}</div>
       ${tablaRenglones(p.items, false)}
       ${p.observaciones ? `<p style="margin-top:.8rem"><b>Observaciones:</b> ${esc(p.observaciones)}</p>` : ""}
-      <p class="ayuda" style="margin-top:.8rem">Podés seguir el estado en <strong>Mis pedidos</strong>.</p>`,
+      <p class="ayuda" style="margin-top:.8rem">La cooperativa lo va a revisar y confirmar. Podés seguir el estado en <strong>Mis pedidos</strong>.</p>`,
     botones: [{ texto: "Imprimir", accion: () => { print(); return false; } }, { texto: "Listo", clase: "btn--rojo" }]
   });
 
@@ -197,6 +197,8 @@
           titulo: `Pedido N.º ${p.numero}`, ancho: true,
           cuerpo: `<div class="ficha"><div><b>Fecha</b>${esc(fecha(p.creado))}</div><div><b>Estado</b>${chipPedido(p.estado)}</div>
               <div><b>Total estimado</b>${esc(plata(p.total))}</div></div>
+            ${p.estado === "cancelado" ? `<p class="nota"><b>La cooperativa canceló este pedido.</b>${p.motivo_cancelacion ? " Motivo: " + esc(p.motivo_cancelacion) : ""}</p>` : ""}
+            ${p.estado === "en_espera" ? '<p class="nota">La cooperativa todavía no confirmó este pedido.</p>' : ""}
             ${tablaRenglones(p.items)}
             ${p.observaciones ? `<p style="margin-top:.8rem"><b>Observaciones:</b> ${esc(p.observaciones)}</p>` : ""}`,
           botones: [{ texto: "Imprimir", accion: () => { print(); return false; } }, { texto: "Cerrar", clase: "btn--rojo" }]

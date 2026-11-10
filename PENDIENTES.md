@@ -1,6 +1,6 @@
 # Pendientes — Lácteos NC
 
-Última actualización: 06/11/2026
+Última actualización: 10/11/2026
 
 Al completar algo: borrarlo de acá y anotarlo en `PLANES.md`.
 Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
@@ -19,9 +19,11 @@ Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
 
 Todo está configurado (Resend verificado, Turnstile y los 4 secretos cargados).
 
-- [ ] **Fer:** hacer un **registro real de prueba** en `/registro/` con un email propio (Claude no puede tildar el "no soy un robot"): recibir el código, verificarlo, ver llegar el aviso a sistemas@laemancipacion.com.ar, activar la cuenta en el panel y recibir el mail de cuenta activa. Después probar un pedido y la página Pedidos.
+- [ ] **Fer:** hacer un **registro real de prueba** en `/registro/` con un email propio (Claude no puede tildar el "no soy un robot"): recibir el código, verificarlo, ver llegar el aviso a sistemas@laemancipacion.com.ar, activar la cuenta en el panel y recibir el mail de cuenta activa.
+- [ ] **Fer:** con ese cliente, ingresar **con el usuario** (no el email), hacer un pedido y seguirlo: En espera → **Aceptar** (✓) o **Cancelar** (✕) desde `/pedidos/` → con un usuario Empleado abrirlo en Armando y marcarlo **Retirado**. Ver que el cliente vea cada estado y que los Indicadores del panel se actualicen.
+- [ ] **Fer:** probar **Cuentas → Nueva cuenta** (por ejemplo un empleado) y que llegue el mail para elegir contraseña.
 - [ ] **Cooperativa:** revisar y aprobar el texto de los **términos y condiciones** (`/terminos/`, hoy en borrador).
-- [ ] **Opcional:** cargar cuentas de **empleados** (se registran como clientes y el administrador les pone el rol Empleado al activarlas).
+- [ ] **Opcional:** cargar cuentas de **empleados** desde el panel → Cuentas → **Nueva cuenta**.
 
 ## Fase 6 — Contacto y mails
 

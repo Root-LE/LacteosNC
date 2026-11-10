@@ -32,10 +32,11 @@ las que ya se aplicaron.
 | `articulos` | Los códigos del sistema de la cooperativa (campo ARTICULO) con su descripción (DENOMINACION); pueden pertenecer a un producto de la web; activo/inactivo |
 | `precios` | Precio de cada **artículo** en cada lista |
 | `novedades` | Título, descripción, datos, foto / YouTube / video, producto relacionado |
-| `pedidos` | Número (desde 1001), cliente, lista, estado, observaciones, total, quién lo abrió y retiró |
+| `pedidos` | Número (desde 1001), cliente, lista, estado, observaciones, total, quién lo aceptó, abrió, retiró o canceló (y el motivo) |
 | `pedido_items` | Renglones: artículo, código, descripción, cantidad, precio unitario y subtotal (copiados al crear el pedido) |
 | `mensajes_contacto` | Mensajes del formulario de contacto |
 | `eventos` | Novedades automáticas para el bot: cliente para activar, cuenta activada o bloqueada, pedido nuevo, armando y retirado (con los datos completos en `datos`) |
+| `intentos_ingreso` | Errores al ingresar con **usuario**: 5 errores seguidos bloquean ese usuario 15 minutos. Nadie la ve salvo el servidor |
 | `verificaciones` | Código de verificación de cada registro pendiente (guardado cifrado), errores, esperas y bloqueos. Nadie la ve salvo el servidor |
 
 ## Roles y permisos
@@ -44,8 +45,8 @@ las que ya se aplicaron.
 |---|---|
 | **Visitante** (sin sesión) | Ver categorías, productos y novedades visibles. Enviar un mensaje de contacto. |
 | **Cliente** (cuenta activa) | Lo anterior + ver los artículos activos con **solo su lista de precios**, crear pedidos y ver **solo sus pedidos**. |
-| **Empleado** | Ver todos los pedidos, abrirlos (pasan a *armando pedido*) y marcarlos como *pedido retirado*. |
-| **Administrador** | Todo lo anterior + cargar productos, precios, listas, novedades y archivos; activar cuentas de clientes y empleados. No puede crear administradores ni modificar a un superadministrador. |
+| **Empleado** | Ver los pedidos **aceptados** (*armando*) y los *retirados*, abrirlos y marcarlos como *retirado*. No ve los pedidos en espera ni los cancelados, y no puede aceptar ni cancelar. |
+| **Administrador** | Todo lo anterior + ver todos los pedidos, **aceptarlos o cancelarlos**, ver los indicadores, crear cuentas, cargar productos, precios, listas, novedades y archivos; activar cuentas de clientes y empleados. No puede crear administradores ni modificar a un superadministrador. |
 | **Superadministrador** | Acceso absoluto: todo lo del administrador y además asigna o quita los roles administrador y superadministrador. Es el único que puede modificar a otro superadministrador. |
 
 Una cuenta que no está **activa** (pendiente de verificación, pendiente de activación o bloqueada)
@@ -54,17 +55,23 @@ no ve precios ni puede pedir, aunque tenga sesión iniciada.
 Estados de una cuenta: `pendiente_verificacion` → (verifica el mail) → `pendiente_activacion` →
 (el administrador asigna usuario y lista) → `activa`. También puede quedar `bloqueada`.
 
-Estados de un pedido: `en_espera` → (un empleado lo abre) → `armando` → `retirado`.
+Estados de un pedido: `en_espera` → (un administrador lo **acepta**) → `armando` → (empleado o admin) → `retirado`.
+Desde `en_espera` un administrador también puede **cancelarlo** (`cancelado`, con motivo opcional que ve el cliente).
+
+Usuario y email son **únicos** (sin distinguir mayúsculas): la base no deja repetirlos.
 
 ## Funciones que llama el sitio
 
 | Función | Quién | Qué hace |
 |---|---|---|
 | `crear_pedido(p_items, p_observaciones)` | Cliente activo | Crea el pedido con los precios de su lista. `p_items` = `[{"articulo_id":1,"cantidad":2}]`. Devuelve número y detalle. |
-| `detalle_pedido(p_numero)` | Dueño o personal | Devuelve el pedido con cliente y renglones. |
-| `abrir_pedido(p_numero)` | Empleado / admin | Si estaba *en espera* pasa a *armando* y devuelve el detalle. |
+| `detalle_pedido(p_numero)` | Dueño o personal | Devuelve el pedido con cliente, renglones, fechas y motivo de cancelación (el empleado solo los aceptados). |
+| `abrir_pedido(p_numero)` | Empleado / admin | Devuelve el detalle (ya no cambia el estado; anota quién lo abrió primero). |
+| `aceptar_pedido(p_numero)` | Administrador | Pasa de *en espera* a *armando*. |
+| `cancelar_pedido(p_numero, p_motivo)` | Administrador | Pasa de *en espera* a *cancelado*, con motivo opcional (hasta 300 caracteres). |
 | `marcar_retirado(p_numero)` | Empleado / admin | Pasa de *armando* a *retirado*. |
 | `activar_cuenta(p_perfil_id, p_usuario, p_lista_id, p_rol)` | Administrador | Asigna usuario, lista y rol, y activa la cuenta. |
+| `kpis()` | Administrador | Indicadores del panel: pedidos (en espera, armando, hoy, semana, mes, retirados, cancelados, total, promedio, tiempos), pedidos por día (30 días), artículos y clientes con más pedidos, cuentas y catálogo. |
 
 ## Archivos (Storage)
 
@@ -92,7 +99,7 @@ update public.perfiles
  where email = 'juan.perez@ejemplo.com';
 ```
 
-Cuando el panel esté listo, el superadministrador podrá hacerlo desde ahí.
+**Ahora se hace desde el panel:** Cuentas → **Nueva cuenta** (administrador o superadministrador; solo el superadministrador crea administradores). Le llega un mail para elegir su contraseña.
 
 ## Función del servidor (Edge Function) `cuentas`
 
@@ -106,6 +113,8 @@ Código en `supabase/functions/cuentas/index.ts`, publicada en
 | `reenviar` | Manda un código nuevo (con "no soy un robot", mínimo 60 s entre envíos, no reinicia los errores) |
 | `estado` | Devuelve si hay un código pendiente y cuánto falta de espera |
 | `avisar_activacion` | Solo administradores: manda al cliente el mail de "cuenta activa" con su usuario y email |
+| `ingresar` | Ingreso con **usuario** en vez de email: busca el email en el servidor (nunca lo muestra), inicia sesión y devuelve la sesión. 5 errores seguidos → espera de 15 minutos. Siempre dice "Usuario o contraseña incorrectos." |
+| `crear_usuario` | Solo administradores: crea una cuenta ya activa (cliente con CUIT y lista, empleado, o admin si lo pide un superadministrador), controla que email, usuario y CUIT no existan y manda el mail "Te creamos una cuenta" con un enlace para elegir la contraseña (vence en 1 hora) |
 | `recuperar` | "Olvidé mi contraseña": manda el mail de Lácteos NC con un enlace a `/admin/?recuperar=…` (vence en 1 hora). Siempre responde lo mismo, exista o no la cuenta |
 
 **Secretos** (Supabase → Edge Functions → Secrets): `RESEND_API_KEY`, `MAIL_REMITENTE`, `TURNSTILE_SECRET` y, opcional, `MAIL_AVISOS`.
@@ -120,7 +129,8 @@ Los guarda la base sola (disparadores), pase lo que pase en la web:
 | `cliente_para_activar` | un cliente verificó su email | usuario, nombre, apellido, email, CUIT |
 | `cuenta_activada` / `cuenta_bloqueada` | un administrador activó o bloqueó una cuenta | lo mismo + rol, lista y estado anterior |
 | `pedido_nuevo` | un cliente confirmó un pedido | número, total, observaciones, cliente y renglones (código, descripción, cantidad, precio) |
-| `pedido_armando` / `pedido_retirado` | cambió el estado del pedido | lo mismo + `por` (usuario que lo cambió) |
+| `pedido_aceptado` / `pedido_retirado` / `pedido_cancelado` | un administrador aceptó o canceló el pedido, o se retiró | lo mismo + `por` (usuario que lo cambió) y, si se canceló, `motivo` |
+| `pedido_armando` | (tipo viejo, ya no se genera: ahora es `pedido_aceptado`) | |
 
 **Cómo lo usa el bot:**
 1. Lee los pendientes: `GET /rest/v1/eventos?procesado=is.null&order=id` (o se suscribe en tiempo real con Supabase Realtime a los `INSERT` de `eventos`).

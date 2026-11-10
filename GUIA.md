@@ -49,10 +49,10 @@ index.html      Página principal: Inicio, Institucional, Productos, Novedades, 
 css/styles.css  Estilos (colores, menú peluche/clásico, animación de leche)
 js/config.js    URL y clave PÚBLICA de Supabase
 js/main.js      Menú, catálogo y novedades (desde Supabase, con lista de respaldo), animación y formulario
-admin/          Login único y panel de administración (productos, artículos, novedades, listas, precios, cuentas)
+admin/          Login único (email o usuario) y panel: indicadores, productos, artículos, novedades, listas, precios, cuentas, actividad
 registro/       Registro de clientes con código de 6 dígitos
 clientes/       Área de clientes: lista de precios, pedido tipo carrito, mis pedidos
-pedidos/        Página Pedidos para empleados y administradores
+pedidos/        Página Pedidos: el admin acepta o cancela (En espera); el empleado ve Armando y marca Retirado
 terminos/       Términos y condiciones
 js/cuenta.js    Funciones compartidas por registro, clientes y pedidos
 supabase/       Migraciones SQL y documentación de la base (supabase/README.md)

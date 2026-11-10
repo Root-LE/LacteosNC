@@ -18,7 +18,8 @@
   const ESTADOS_PEDIDO = {
     en_espera: ["En espera", "chip--ambar"],
     armando: ["Armando pedido", "chip--azul"],
-    retirado: ["Pedido retirado", "chip--verde"]
+    retirado: ["Pedido retirado", "chip--verde"],
+    cancelado: ["Cancelado", "chip--cancelado"]
   };
   const chipPedido = e => `<span class="chip ${ESTADOS_PEDIDO[e]?.[1] || ""}">${esc(ESTADOS_PEDIDO[e]?.[0] || e)}</span>`;
 

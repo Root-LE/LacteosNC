@@ -366,3 +366,31 @@ Cada plan nuevo se agrega al final con la misma estructura.
 5. Probado en navegador: el campo contraseña se oculta, el botón cambia, se envía el pedido correcto, "Volver a ingresar" restaura el formulario y un enlace vencido muestra el aviso.
 
 **Archivos:** `admin/index.html`, `admin/admin.js`, `supabase/functions/cuentas/index.ts`, `supabase/migrations/20261110_12_recuperar_clave.sql`.
+
+---
+
+## Plan 18 — Ingreso con usuario, alta de cuentas desde el panel, aceptar/cancelar pedidos e indicadores
+
+**Fecha:** 10/11/2026 · **Estado:** hecho (falta la prueba real de Fer con un cliente)
+
+**Pedido de Fer:** ingresar con email **o** usuario (los dos únicos); que superadmin y administrador puedan crear usuarios; que un pedido nuevo quede en **En espera** con una columna **Acción** (aceptar o cancelar) que solo usan superadmin y administrador; al aceptarlo pasa a **Armando**, la solapa que ven los empleados, y el empleado lo marca **Retirado**; agregar KPIs (no había).
+
+**Pasos:**
+1. **Base (migraciones 13a y 13b):**
+   - estado nuevo `cancelado`; columnas `aceptado`, `aceptado_por`, `cancelado`, `cancelado_por`, `motivo_cancelacion`;
+   - funciones `aceptar_pedido` y `cancelar_pedido` (solo administradores); `abrir_pedido` ya no cambia el estado;
+   - el empleado solo ve pedidos en *armando* y *retirado* (lo controla la base, no solo la página);
+   - eventos nuevos para el bot: `pedido_aceptado` y `pedido_cancelado` (con motivo);
+   - usuario y email **únicos** sin distinguir mayúsculas;
+   - `intentos_ingreso`: 5 errores con un usuario lo bloquean 15 minutos;
+   - función `kpis()` para el panel.
+2. **Función `cuentas`:** acción `ingresar` (busca el email del usuario en el servidor sin mostrarlo) y `crear_usuario` (crea la cuenta activa, controla duplicados de email, usuario y CUIT, y manda el mail "Te creamos una cuenta en Lácteos NC" con enlace para elegir contraseña).
+3. **Login:** el campo dice "Email o usuario"; con @ entra directo, sin @ pasa por el servidor.
+4. **Panel:** sección nueva **Indicadores** (la primera): pedidos en espera y armando, hoy, mes, total estimado, tiempos de aceptación y retiro, clientes activos, cuentas para activar, gráfico de pedidos por día (con tabla), artículos y clientes con más pedidos y estado del catálogo. En **Cuentas**, botón **Nueva cuenta**.
+5. **Pedidos (`/pedidos/`):**
+   - administrador: solapas En espera (con ✓ aceptar y ✕ cancelar con motivo opcional), Armando, Retirados, Cancelados y Todos;
+   - empleado: solo Armando y Retirados; al abrir un pedido, **Marcar como retirado**.
+6. **Área de clientes:** muestra el pedido cancelado con su motivo.
+7. Probado en la base con una transacción que se deshace (duplicados, permisos de cada rol, cada cambio de estado, eventos y KPIs) y en navegador con datos simulados (vista admin, vista empleado, ingreso con usuario, nueva cuenta, indicadores). La numeración de pedidos se volvió a dejar en **1001**.
+
+**Archivos:** `supabase/migrations/20261110_13a_estado_cancelado.sql`, `supabase/migrations/20261110_13b_pedidos_aceptar_kpis.sql`, `supabase/functions/cuentas/index.ts`, `admin/*`, `pedidos/*`, `clientes/clientes.js`, `js/cuenta.js`, `supabase/README.md`.

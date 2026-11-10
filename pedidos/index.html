@@ -6,11 +6,11 @@
 <title>Pedidos | Lácteos NC</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="/img/favicon.png">
-<link rel="stylesheet" href="/admin/admin.css?v=2">
+<link rel="stylesheet" href="/admin/admin.css?v=4">
 <script src="/admin/vendor/supabase-2.119.0.js"></script>
 <script src="/js/config.js?v=7"></script>
-<script src="/js/cuenta.js?v=1"></script>
-<script src="pedidos.js?v=1" defer></script>
+<script src="/js/cuenta.js?v=2"></script>
+<script src="pedidos.js?v=2" defer></script>
 </head>
 <body>
 <div class="cuenta">
@@ -26,10 +26,11 @@
     </div>
   </header>
   <nav class="pestanas" aria-label="Secciones">
-    <a href="#en_espera">En espera <span class="contador" id="cont-en_espera" hidden></span></a>
+    <a href="#en_espera" data-solo-admin hidden>En espera <span class="contador" id="cont-en_espera" hidden></span></a>
     <a href="#armando">Armando <span class="contador" id="cont-armando" hidden></span></a>
     <a href="#retirado">Retirados</a>
-    <a href="#todos">Todos</a>
+    <a href="#cancelado" data-solo-admin hidden>Cancelados</a>
+    <a href="#todos" data-solo-admin hidden>Todos</a>
     <a href="/admin/" id="ir-panel" hidden>Panel de administración</a>
   </nav>
   <main class="contenido" id="contenido" tabindex="-1"><p class="vacio">Cargando…</p></main>
