@@ -458,37 +458,51 @@ Cada plan nuevo se agrega al final con la misma estructura.
 
 ---
 
-## Plan 21 — Carcasa imprimible del bot: "Quesito NC"
+## Plan 21 — Carcasa imprimible del bot: REGGI, en tres formatos de queso
 
-**Fecha:** 11/11/2026 · **Estado:** diseño hecho (falta imprimir y armar)
+**Fecha:** 11/11/2026 · **Estado:** diseño hecho (falta elegir el modelo, imprimir y armar)
 
-**Pedido de Fer:** diseñar para impresora 3D el bot que se va a usar más adelante, al estilo de Troko (trokotec.com/troko), con formato de queso y el logo de Lácteos NC atrás.
+**Pedido de Fer:**
+- diseñar para impresora 3D el bot que se va a usar más adelante, al estilo de Troko (trokotec.com/troko), con formato de queso y el logo de Lácteos NC atrás;
+- después, ponerle de nombre **REGGI** (por el Reggianito), escrito adelante, y sumar dos estilos más: uno redondo y otro con el formato de Troko.
 
-**Diseño:**
-- **Forma:** cuña de queso de 90 × 75 × 92 mm.
-- **Pantalla:** la cara inclinada a 45° lleva la pantalla IPS de 1,54" (240×240, ST7789), que es la cara del bot.
-- **Agujeros de queso:**
-  - decorativos en las caras y "mordiscos" en las aristas;
-  - funcionales: la rejilla del parlante de 40 mm (pared derecha) y el micrófono INMP441 (pared izquierda).
-- **Atrás:** logo de Lácteos NC en un hueco de 1,2 mm, para pegar la pieza en rojo o imprimir en multicolor, y ranura para los USB-C.
-- **Tapa de abajo:** cuna para el ESP32-S3 DevKitC-1 (N16R8) y para el MAX98357A, agujeros de ventilación y huecos para patitas de goma.
-- **Electrónica:** la misma que Troko (ESP32-S3, ST7789, INMP441, MAX98357A), pensada para el firmware de asistente por voz Xiaozhi.
+**Los tres modelos** (misma electrónica en todos):
+- **Electrónica:** ESP32-S3 DevKitC-1 N16R8, pantalla IPS 1,54" 240×240 ST7789, micrófono INMP441, amplificador MAX98357A y parlante de 40 mm. Pensada para el firmware de asistente por voz Xiaozhi, igual que Troko.
+- **1 · Cuña** (90 × 75 × 92 mm):
+  - la pantalla en la cara inclinada a 45°;
+  - ojos de queso en las caras y "mordiscos" en las aristas (por dentro, las aristas tienen un refuerzo macizo para que no se perfore la pared);
+  - REGGI en la cara de adelante y el logo atrás.
+- **2 · Horma** (158 × 84 × 120 mm):
+  - horma de Reggianito parada, con una porción cortada (los ojos de queso están en las caras del corte);
+  - la pantalla y REGGI adelante; el logo en la tapa trasera, que va atornillada;
+  - se apoya en una **tabla de quesos con manija**: una tabla con vetas encima de una bandeja que guarda el ESP32 y el amplificador, con el USB-C atrás.
+- **3 · Cubito** (78 × 72 × 80 mm):
+  - el formato de Troko: cubo de aristas redondeadas, la pantalla en un marco oscuro (pieza aparte para imprimir en negro) y REGGI abajo;
+  - ojos de queso arriba, a los costados y en las aristas;
+  - el logo y el USB-C atrás.
 
 **Pasos:**
-1. Se revisó la página de Troko: es un compañero de escritorio de ~11 cm con ESP32-S3, pantalla ST7789 de 240×240, micrófono INMP441 y amplificador MAX98357A, con carcasa impresa en PLA y firmware Xiaozhi.
-2. Se armó un generador paramétrico en Python (`generar_carcasa.py`, con `manifold3d`), con todas las medidas al principio.
-3. El logo se vectorizó desde `img/logo-nc-lg.png` (solo lo rojo). Se sacó "Jacinto Arauz" porque a 60 mm de ancho sus letras quedarían de 0,3 mm.
-4. Las aristas tienen un refuerzo macizo por dentro para que los mordiscos no perforen la pared. Lo decorativo deja siempre al menos 0,8 mm.
-5. Se comprobó:
-   - las 5 piezas son sólidos cerrados;
-   - los únicos agujeros pasantes son los funcionales (ventana, USB, micrófono y 17 de la rejilla);
+1. Se revisó la página de Troko: es un compañero de escritorio de ~11 cm con forma de cubo redondeado, pantalla grande al frente y el nombre abajo, con ESP32-S3 y firmware Xiaozhi.
+2. Se armaron generadores paramétricos en Python con `manifold3d`:
+   - `comun.py`, con las piezas compartidas: pantalla con marco y postes, rejilla del parlante con aro, micrófono, tapa con la cuna del ESP32, logo y nombre;
+   - un programa por modelo: `cuna.py`, `horma.py` y `cubito.py`.
+3. El logo se vectorizó desde `img/logo-nc-lg.png` (solo lo rojo), sin "Jacinto Arauz" porque a ese tamaño sus letras quedarían de 0,3 mm. REGGI está en Barlow Condensed ExtraBold, la tipografía de títulos del sitio.
+4. El logo, REGGI y el marco del cubito van en huecos de 1,2 mm (1 mm el marco): se pegan impresos aparte o se imprimen juntos en multicolor, con piezas "en su lugar" ya alineadas.
+5. Todas las piezas salen en posición de impresión y sin soportes: la cuña con la boca abajo, la horma con la cara de adelante sobre la cama, el cubito boca abajo y las tapas y la tabla planas.
+6. Se comprobó:
+   - las 25 piezas son sólidos cerrados (se releyeron los STL);
+   - los agujeros pasantes son solo los funcionales: ventana, rejilla, micrófono, USB y paso de cables;
+   - los ojos de queso dejan al menos 0,8 mm de pared;
    - ningún componente choca con la carcasa ni con otro;
-   - se imprime sin soportes.
+   - los tornillos de la tabla caen en sus postes.
+7. En el camino se corrigió:
+   - el logo de la horma tocaba el corte de la porción: se achicó y se corrió;
+   - la pestaña de la tapa trasera era fina: pasó de 2 a 6 mm donde van los tornillos;
+   - el parlante y el amplificador rozaban otras piezas y se movieron;
+   - había astillas y bordes dudosos que dejaban las operaciones booleanas, y se eliminaron.
 
-**Entregado por el chat:** `quesito-nc-carcasa.zip`, con:
-- los STL (cuerpo, tapa, soporte de pantalla, logo rojo y logo en su lugar para multicolor);
-- el generador;
-- las vistas;
-- `LEEME.md`, con la configuración de impresión, la lista de componentes y el armado.
+**Entregado por el chat:**
+- `reggi-carcasas.zip`: los STL de los tres modelos, los generadores, las vistas y `LEEME.md` (componentes, impresión y armado);
+- `reggi-tres-modelos.png`: la lámina comparativa.
 
 No se subió al repositorio del sitio para que no quede publicado en la web.

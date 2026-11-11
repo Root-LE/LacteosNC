@@ -1,6 +1,6 @@
 # Pendientes — Lácteos NC
 
-Última actualización: 10/11/2026
+Última actualización: 11/11/2026
 
 Al completar algo: borrarlo de acá y anotarlo en `PLANES.md`.
 Responsable: **Fer** = lo hace el usuario · **Claude** = lo hace Claude.
@@ -36,7 +36,7 @@ Todo está configurado (Resend verificado, Turnstile y los 4 secretos cargados).
 
 ## Bot de automatización
 
-- [ ] **Fer:** imprimir la carcasa **Quesito NC** (Plan 21), comprar los componentes y medir la placa de la pantalla antes de imprimir (las medidas varían según el vendedor).
+- [ ] **Fer:** elegir el modelo de **REGGI** (cuña, horma o cubito, Plan 21), comprar los componentes, medir la placa de la pantalla antes de imprimir (las medidas cambian según el vendedor) e imprimir.
 - [ ] **Fer:** definir qué hace el bot con cada novedad (WhatsApp, Telegram, carga en el sistema, etc.). La base ya guarda todo en `eventos` (ver `supabase/README.md`).
 
 ## Contenido y fotos
