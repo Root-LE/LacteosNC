@@ -36,6 +36,7 @@ Todo está configurado (Resend verificado, Turnstile y los 4 secretos cargados).
 
 ## Bot de automatización
 
+- [ ] **Fer:** imprimir la carcasa **Quesito NC** (Plan 21), comprar los componentes y medir la placa de la pantalla antes de imprimir (las medidas varían según el vendedor).
 - [ ] **Fer:** definir qué hace el bot con cada novedad (WhatsApp, Telegram, carga en el sistema, etc.). La base ya guarda todo en `eventos` (ver `supabase/README.md`).
 
 ## Contenido y fotos

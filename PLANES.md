@@ -455,3 +455,40 @@ Cada plan nuevo se agrega al final con la misma estructura.
 5. Probado en la base (transacción que se deshace) sobre el pedido 1001: dos pesadas suman bien, quitar descuenta, bultos se guardan, kilos 0 rechazado, el cliente no puede pesar ni leer la tabla, y en un pedido retirado no se puede pesar. En navegador con datos simulados: carga de pesadas, cantidad sugerida, bultos y aviso al retirar.
 
 **Archivos:** `supabase/migrations/20261110_16_pesadas_y_bultos.sql`, `pedidos/pedidos.js`, `pedidos/index.html`, `admin/admin.css`, `supabase/README.md`.
+
+---
+
+## Plan 21 — Carcasa imprimible del bot: "Quesito NC"
+
+**Fecha:** 11/11/2026 · **Estado:** diseño hecho (falta imprimir y armar)
+
+**Pedido de Fer:** diseñar para impresora 3D el bot que se va a usar más adelante, al estilo de Troko (trokotec.com/troko), con formato de queso y el logo de Lácteos NC atrás.
+
+**Diseño:**
+- **Forma:** cuña de queso de 90 × 75 × 92 mm.
+- **Pantalla:** la cara inclinada a 45° lleva la pantalla IPS de 1,54" (240×240, ST7789), que es la cara del bot.
+- **Agujeros de queso:**
+  - decorativos en las caras y "mordiscos" en las aristas;
+  - funcionales: la rejilla del parlante de 40 mm (pared derecha) y el micrófono INMP441 (pared izquierda).
+- **Atrás:** logo de Lácteos NC en un hueco de 1,2 mm, para pegar la pieza en rojo o imprimir en multicolor, y ranura para los USB-C.
+- **Tapa de abajo:** cuna para el ESP32-S3 DevKitC-1 (N16R8) y para el MAX98357A, agujeros de ventilación y huecos para patitas de goma.
+- **Electrónica:** la misma que Troko (ESP32-S3, ST7789, INMP441, MAX98357A), pensada para el firmware de asistente por voz Xiaozhi.
+
+**Pasos:**
+1. Se revisó la página de Troko: es un compañero de escritorio de ~11 cm con ESP32-S3, pantalla ST7789 de 240×240, micrófono INMP441 y amplificador MAX98357A, con carcasa impresa en PLA y firmware Xiaozhi.
+2. Se armó un generador paramétrico en Python (`generar_carcasa.py`, con `manifold3d`), con todas las medidas al principio.
+3. El logo se vectorizó desde `img/logo-nc-lg.png` (solo lo rojo). Se sacó "Jacinto Arauz" porque a 60 mm de ancho sus letras quedarían de 0,3 mm.
+4. Las aristas tienen un refuerzo macizo por dentro para que los mordiscos no perforen la pared. Lo decorativo deja siempre al menos 0,8 mm.
+5. Se comprobó:
+   - las 5 piezas son sólidos cerrados;
+   - los únicos agujeros pasantes son los funcionales (ventana, USB, micrófono y 17 de la rejilla);
+   - ningún componente choca con la carcasa ni con otro;
+   - se imprime sin soportes.
+
+**Entregado por el chat:** `quesito-nc-carcasa.zip`, con:
+- los STL (cuerpo, tapa, soporte de pantalla, logo rojo y logo en su lugar para multicolor);
+- el generador;
+- las vistas;
+- `LEEME.md`, con la configuración de impresión, la lista de componentes y el armado.
+
+No se subió al repositorio del sitio para que no quede publicado en la web.
