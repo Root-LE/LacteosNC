@@ -468,7 +468,7 @@ Cada plan nuevo se agrega al final con la misma estructura.
 
 **Los tres modelos** (misma electrónica en todos):
 - **Electrónica:** ESP32-S3 DevKitC-1 N16R8, pantalla IPS 1,54" 240×240 ST7789, micrófono INMP441, amplificador MAX98357A y parlante de 40 mm. Pensada para el firmware de asistente por voz Xiaozhi, igual que Troko.
-- **1 · Cuña** (90 × 75 × 92 mm):
+- **1 · Cuña** (90 × 75 × 92 mm; 111 × 84 × 102 con brazos y patitas):
   - la pantalla en la cara inclinada a 45°;
   - ojos de queso en las caras y "mordiscos" en las aristas (por dentro, las aristas tienen un refuerzo macizo para que no se perfore la pared);
   - REGGI en la cara de adelante y el logo atrás.
@@ -476,7 +476,7 @@ Cada plan nuevo se agrega al final con la misma estructura.
   - horma de Reggianito parada, con una porción cortada (los ojos de queso están en las caras del corte);
   - la pantalla y REGGI adelante; el logo en la tapa trasera, que va atornillada;
   - se apoya en una **tabla de quesos con manija**: una tabla con vetas encima de una bandeja que guarda el ESP32 y el amplificador, con el USB-C atrás.
-- **3 · Cubito** (78 × 72 × 80 mm):
+- **3 · Cubito** (78 × 72 × 80 mm; 99 × 79 × 90 con brazos y patitas):
   - el formato de Troko: cubo de aristas redondeadas, la pantalla en un marco oscuro (pieza aparte para imprimir en negro) y REGGI abajo;
   - ojos de queso arriba, a los costados y en las aristas;
   - el logo y el USB-C atrás.
@@ -501,8 +501,15 @@ Cada plan nuevo se agrega al final con la misma estructura.
    - el parlante y el amplificador rozaban otras piezas y se movieron;
    - había astillas y bordes dudosos que dejaban las operaciones booleanas, y se eliminaron.
 
+8. **Brazos y patitas (12/11/2026)**, a pedido de Fer, con el ejemplo de un muñeco tipo yeti:
+   - brazos regordetes con dos surcos de dedos en la mano: a los costados en la cuña y el cubito, y en la cara de adelante en la horma (las manos asoman por los costados);
+   - patitas ovaladas: en la cuña y el cubito, 2 grandes adelante y 2 chicas atrás, debajo de la tapa (levantan el bot 1 cm y reemplazan a las patitas de goma); en la horma, 2 apoyadas en la tabla;
+   - son piezas aparte que se imprimen planas, sin soportes, y se pegan alineadas con tarugos de filamento de 1,75 mm (agujeros de 2 mm en las dos partes);
+   - para dejarles lugar, se corrió el micrófono de la cuña y el parlante del cubito, y los ojos de queso ya no caen debajo de los brazos;
+   - comprobado: las 36 piezas cerradas; brazos y patitas apoyan sin meterse en la carcasa; los agujeros coinciden; las patitas no tapan los tornillos de la tapa ni cortan los rieles del ESP32.
+
 **Entregado por el chat:**
-- `reggi-carcasas.zip`: los STL de los tres modelos, los generadores, las vistas y `LEEME.md` (componentes, impresión y armado);
-- `reggi-tres-modelos.png`: la lámina comparativa.
+- `reggi-carcasas.zip`: los STL de los tres modelos con brazos y patitas, los generadores, las vistas y `LEEME.md` (componentes, impresión y armado);
+- `reggi-con-brazos-y-patas.png`: la lámina comparativa.
 
 No se subió al repositorio del sitio para que no quede publicado en la web.
